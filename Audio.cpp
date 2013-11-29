@@ -7,7 +7,7 @@ SF_Container sf;
 bool finished;
 
 //
-//
+// Callback function for PortAudio during audio streaming
 //
 static int paCallback(const void *inputBuffer, 
                       void *outputBuffer,
@@ -19,26 +19,8 @@ static int paCallback(const void *inputBuffer,
     int i, j, bufferIndex;
     float sample; 
     float *out = (float*) outputBuffer;
-    float *in  = (float*) inputBuffer;
     float fileBuffer[framesPerBuffer*PAC_CHANNELS];
-    static int order = 0;
     
-    /*
-    //search through the shared buffer for free packet
-    for (i=0, bufferIndex=0; i<BUFFER_SIZE; i++, bufferIndex++) {
-        // break if free packet is found
-        if (sharedBuffer[i].free) 
-            break;
-        
-        // if on last packet and none are free, return
-        if (i>=BUFFER_SIZE)
-            return paContinue;
-    }
-    
-    //set and increment order
-    sharedBuffer[bufferIndex].order = order;
-    order++;
-    */
     //get samples from sound file
     int readcount = framesPerBuffer;
     if (!inputBuffer)
@@ -50,18 +32,11 @@ static int paCallback(const void *inputBuffer,
             //send sample to output buffer
             sample = fileBuffer[STEREO*i + j];
             out[STEREO*i + j] = sample;
-            /*
-            //window and send sample to shared buffer
-            sharedBuffer[bufferIndex].averageAmp += (float)sample;
-            //Do more here later when OpenGL is ready
-            sharedBuffer[bufferIndex].frames[i][j] = sample;
-            */
         }
     }
-    /*
-    sharedBuffer[bufferIndex].averageAmp /= (float)framesPerBuffer;
-    sharedBuffer[bufferIndex].free = false;
-    */
+    
+    printf("%.8f\n", sample);
+
     //if we've reached the end of the file, end callback
     if (readcount < framesPerBuffer) {
         finished = true;
@@ -71,7 +46,7 @@ static int paCallback(const void *inputBuffer,
 }
 
 //
-//
+// Returns PortAudio output device parameters
 //
 PaStreamParameters getStreamParams() {
     PaStreamParameters params;
@@ -84,7 +59,7 @@ PaStreamParameters getStreamParams() {
 }
 
 //
-//
+// Open and read audio file. Initialize and start PortAudio stream
 //
 bool startAudio(PaStream *stream, const char* filename) {
     
@@ -127,7 +102,7 @@ bool startAudio(PaStream *stream, const char* filename) {
 }
 
 //
-//
+// End audio stream
 //
 void endAudio(PaStream *stream) {
     Pa_StopStream(stream);
@@ -136,6 +111,10 @@ void endAudio(PaStream *stream) {
     sf_close(sf.file);
 }
 
+/*
+//
+// Simple main to test audio playback
+//
 int main(int argc, char *argv[]) {
     PaStream *stream;
     SF_Container infile; 
@@ -149,5 +128,6 @@ int main(int argc, char *argv[]) {
     startAudio(&stream, argv[1]);
     while (!finished);
     endAudio(&stream);
-    return 0;
+    return EXIT_SUCCESS;
 }
+*/
