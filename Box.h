@@ -11,7 +11,7 @@ public:
     Box();
     virtual ~Box();
    
-    virtual void redraw();
+    virtual void redraw(float);
    
 protected:
 

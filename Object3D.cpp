@@ -53,7 +53,6 @@ void Object3D::setRotate( float a, float dx, float dy, float dz ) {
 // Sets the object's color
 //
 void Object3D::setColor(Color* c ) {
-    delete(color);
     color = c;
 }
 

@@ -21,7 +21,7 @@ public:
     Point3* getLocation();             
     Point3* getSize();
     
-    virtual void redraw() = 0;
+    virtual void redraw(float) = 0;
     
 protected:
     float xLoc, yLoc, zLoc;        // location (origin) of the object

@@ -5,6 +5,7 @@
 Packet *sharedBuffer;
 SF_Container sf;
 bool finished;
+float sample;
 
 //
 // Callback function for PortAudio during audio streaming
@@ -17,7 +18,6 @@ static int paCallback(const void *inputBuffer,
                       void *userData) {
     
     int i, j, bufferIndex;
-    float sample; 
     float *out = (float*) outputBuffer;
     float fileBuffer[framesPerBuffer*PAC_CHANNELS];
     
@@ -35,10 +35,9 @@ static int paCallback(const void *inputBuffer,
         }
     }
     
-    printf("%.8f\n", sample);
 
     //if we've reached the end of the file, end callback
-    if (readcount < framesPerBuffer) {
+    if ((unsigned)readcount < framesPerBuffer) {
         finished = true;
         return paComplete;
     }
@@ -62,7 +61,7 @@ PaStreamParameters getStreamParams() {
 // Open and read audio file. Initialize and start PortAudio stream
 //
 bool startAudio(PaStream *stream, const char* filename) {
-    
+
     //Open file
     if ((sf.file = sf_open(filename, SFM_READ, &sf.info)) == NULL) {
         printf("Error reading file");
@@ -111,6 +110,9 @@ void endAudio(PaStream *stream) {
     sf_close(sf.file);
 }
 
+float getSample() {
+    return sample;
+}
 /*
 //
 // Simple main to test audio playback
