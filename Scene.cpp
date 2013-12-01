@@ -9,6 +9,9 @@
 
 #include <iostream>
 #include <GL/glui.h>
+#include "Audio.h"
+
+Packet *sharedBuffer;
 
 // Constructors
 // ------------------------------------------------------------------

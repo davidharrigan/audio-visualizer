@@ -12,14 +12,13 @@
 #define BUFFER 256
 #define STEREO 2
 
-#define PACKET_SIZE 256
 #define BUFFER_SIZE 100
 #define PAC_CHANNELS 2
 
 #define PI 3.1415926535
 
 typedef struct {
-    float frames[PACKET_SIZE][PAC_CHANNELS];
+    float frames[BUFFER][PAC_CHANNELS];
     bool free;
     int order;
     float averageAmp;

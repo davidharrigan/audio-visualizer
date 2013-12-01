@@ -12,6 +12,7 @@
 
 int windowWidth  = 640;
 int windowHeight = 480;
+extern Packet *sharedBuffer;
 PaStream *stream;
 Scene *scene;
 
@@ -59,6 +60,7 @@ void redraw(void) {
 
 int main(int argc, char *argv[]) {
     int window;
+    sharedBuffer = (Packet*)malloc(sizeof(Packet) * BUFFER_SIZE);
 
     if (argc != 2) {
         printf("No sound file\n");

@@ -12,6 +12,7 @@
 #include <GL/glut.h>
 #include "Object3D.h"
 #include "Audio.h"
+#include "fft.h"
 
 class Scene {
 public:

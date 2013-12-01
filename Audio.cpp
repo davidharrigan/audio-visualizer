@@ -2,7 +2,7 @@
 #include <string.h>
 #include <string>
 
-Packet *sharedBuffer;
+extern Packet *sharedBuffer;
 SF_Container sf;
 bool finished;
 float sample;
@@ -20,6 +20,19 @@ static int paCallback(const void *inputBuffer,
     int i, j, bufferIndex;
     float *out = (float*) outputBuffer;
     float fileBuffer[framesPerBuffer*PAC_CHANNELS];
+    static int order = 0;
+
+    //search through the shared buffer for free packet
+    for (i=0, bufferIndex=0; i<BUFFER_SIZE; i++, bufferIndex++) {
+        //if free packet found, break loop
+        if (sharedBuffer[i].free) break;
+        //if we're on the last packet and none are free, return
+        else if (i>=BUFFER_SIZE) return paContinue; 
+    }
+
+    //set and increment order
+    sharedBuffer[bufferIndex].order = order;
+    order++;
     
     //get samples from sound file
     int readcount = framesPerBuffer;
@@ -32,9 +45,14 @@ static int paCallback(const void *inputBuffer,
             //send sample to output buffer
             sample = fileBuffer[STEREO*i + j];
             out[STEREO*i + j] = sample;
+
+            //save information in the shared buffer
+            sharedBuffer[bufferIndex].averageAmp += sample;
+            sharedBuffer[bufferIndex].frames[i][j] = sample;
         }
     }
-    
+    sharedBuffer[bufferIndex].averageAmp /= (float)framesPerBuffer;
+    sharedBuffer[bufferIndex].free = false;
 
     //if we've reached the end of the file, end callback
     if ((unsigned)readcount < framesPerBuffer) {
