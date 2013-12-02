@@ -34,4 +34,6 @@ bool startAudio(PaStream*, const char*);
 void endAudio(PaStream*);
 float getSample();
 int getOrderCount();
+float getAvgAmp();
+float* getBuffer();
 #endif 

@@ -6,6 +6,8 @@ extern Packet *sharedBuffer;
 SF_Container sf;
 bool finished;
 float sample;
+float *buffer;
+float averageAmp;
 int order = 0;
 
 //
@@ -49,9 +51,12 @@ static int paCallback(const void *inputBuffer,
             //save information in the shared buffer
             sharedBuffer[bufferIndex].averageAmp += sample;
             sharedBuffer[bufferIndex].frames[i][j] = sample;
+
+            buffer[STEREO*i + j] = sample;
         }
     }
     sharedBuffer[bufferIndex].averageAmp /= (float)framesPerBuffer;
+    averageAmp = sharedBuffer[bufferIndex].averageAmp;
     sharedBuffer[bufferIndex].free = false;
 
     //if we've reached the end of the file, end callback
@@ -87,6 +92,8 @@ bool startAudio(PaStream *stream, const char* filename) {
     }
     PaError err = Pa_Initialize();
     int samplerate = sf.info.samplerate;
+
+    buffer = new float[BUFFER_SIZE];
     
     //port audio initialize
     if (err != paNoError) {
@@ -135,6 +142,15 @@ float getSample() {
 int getOrderCount() {
     return order;
 }
+
+float getAvgAmp() {
+    return averageAmp;
+}
+
+float* getBuffer() {
+    return buffer;
+}
+
 /*
 //
 // Simple main to test audio playback

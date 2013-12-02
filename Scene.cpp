@@ -12,12 +12,14 @@
 #include "Audio.h"
 
 Packet *sharedBuffer;
+int bufferIndex;
 
 // Constructors
 // ------------------------------------------------------------------
 
 Scene::Scene() {
     fftObject = new fft();
+    bufferIndex = 0;
 }
 
 
@@ -47,10 +49,13 @@ void Scene::redraw() {
     //glScalef(0.5, 0.5, 2.0);
     std::vector<Object3D*>::iterator it;
     int i;
+    float* buffer = getBuffer();
     for (i=0, it = objects.begin(); it != objects.end(); i++, it++) {
-          //float b = sharedBuffer.frames[i+5][1]; 
-          (*it)->redraw(getSample());
-
+        float freq = buffer[i+50];
+        freq *= 0.96;
+        if (freq < buffer[i+40]) 
+            freq = buffer[i+40];
+          (*it)->redraw(freq);
     }
 }
 

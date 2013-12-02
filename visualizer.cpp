@@ -22,10 +22,10 @@ Scene *scene;
 //
 void createScene(void) {
     scene = new Scene();
-    for (int i=0; i<20; i++) {
+    for (int i=0; i<6; i++) {
         Box *b = new Box();
         b->setSize(0.3,0.5,0.5);
-        b->setLocation(i*0.5+0.1, 0, 0);
+        b->setLocation(1-i*0.5, 0, 0);
         scene->addObject(b);
     }
 }
@@ -36,7 +36,7 @@ void createScene(void) {
 void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(10, windowWidth/windowHeight, 0.1, 100.0);
+    gluPerspective(10, windowWidth/windowHeight, 0.1, 1000.0);
     glutPostRedisplay();
 }
 
