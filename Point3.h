@@ -13,6 +13,7 @@ public:
     float y;
     float z;
     
+    Point3();
     Point3( float x, float y, float z );
 }; 
 

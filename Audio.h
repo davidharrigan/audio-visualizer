@@ -33,4 +33,5 @@ PaStreamParameters getStreamParams();
 bool startAudio(PaStream*, const char*);
 void endAudio(PaStream*);
 float getSample();
+int getOrderCount();
 #endif 

@@ -6,6 +6,7 @@ extern Packet *sharedBuffer;
 SF_Container sf;
 bool finished;
 float sample;
+int order = 0;
 
 //
 // Callback function for PortAudio during audio streaming
@@ -20,7 +21,6 @@ static int paCallback(const void *inputBuffer,
     int i, j, bufferIndex;
     float *out = (float*) outputBuffer;
     float fileBuffer[framesPerBuffer*PAC_CHANNELS];
-    static int order = 0;
 
     //search through the shared buffer for free packet
     for (i=0, bufferIndex=0; i<BUFFER_SIZE; i++, bufferIndex++) {
@@ -32,7 +32,7 @@ static int paCallback(const void *inputBuffer,
 
     //set and increment order
     sharedBuffer[bufferIndex].order = order;
-    order++;
+    order += 1;
     
     //get samples from sound file
     int readcount = framesPerBuffer;
@@ -130,6 +130,10 @@ void endAudio(PaStream *stream) {
 
 float getSample() {
     return sample;
+}
+
+int getOrderCount() {
+    return order;
 }
 /*
 //

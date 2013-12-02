@@ -23,7 +23,11 @@ public:
     void redraw();
     
 protected:
-    //---- objects collection -------
+    int getLatestBufferIndex();
+    //objects collection
     std::vector<Object3D*> objects;
+
+    //fft object
+    fft* fftObject;
 };
 #endif /*SCENE_H_*/
