@@ -1,173 +1,178 @@
 #include "Audio.h"
-#include <string.h>
 #include <string>
+#include <stdio.h>
+#include <math.h>
 
-extern Packet *sharedBuffer;
-SF_Container sf;
-bool finished;
-float sample;
-float *buffer;
-float averageAmp;
-int order = 0;
+static FMOD_CHANNELGROUP *channelGroup;
+static FMOD_SYSTEM *system;
 
-//
-// Callback function for PortAudio during audio streaming
-//
-static int paCallback(const void *inputBuffer, 
-                      void *outputBuffer,
-                      unsigned long framesPerBuffer,
-                      const PaStreamCallbackTimeInfo* timeInfo,
-                      PaStreamCallbackFlags statusFlags, 
-                      void *userData) {
-    
-    int i, j, bufferIndex;
-    float *out = (float*) outputBuffer;
-    float fileBuffer[framesPerBuffer*PAC_CHANNELS];
+float fftValues_[8192];			//
+float fftInterpValues_[8192];			//
+float fftSpectrum_[8192];		// maximum #ofFmodSoundPlayer is 8192, in fmodex....
 
-    //search through the shared buffer for free packet
-    for (i=0, bufferIndex=0; i<BUFFER_SIZE; i++, bufferIndex++) {
-        //if free packet found, break loop
-        if (sharedBuffer[i].free) break;
-        //if we're on the last packet and none are free, return
-        else if (i>=BUFFER_SIZE) return paContinue; 
-    }
+// Global functions
+//----------------------------------------------------------- 
 
-    //set and increment order
-    sharedBuffer[bufferIndex].order = order;
-    order += 1;
-    
-    //get samples from sound file
-    int readcount = framesPerBuffer;
-    if (!inputBuffer)
-        readcount = sf_readf_float(sf.file, fileBuffer, framesPerBuffer);
-
-    //fill buffer from sound file
-    for (i=0; i<framesPerBuffer; i++) {
-        for (j=0; j<PAC_CHANNELS; j++) {
-            //send sample to output buffer
-            sample = fileBuffer[STEREO*i + j];
-            out[STEREO*i + j] = sample;
-
-            //save information in the shared buffer
-            sharedBuffer[bufferIndex].averageAmp += sample;
-            sharedBuffer[bufferIndex].frames[i][j] = sample;
-
-            buffer[STEREO*i + j] = sample;
-        }
-    }
-    sharedBuffer[bufferIndex].averageAmp /= (float)framesPerBuffer;
-    averageAmp = sharedBuffer[bufferIndex].averageAmp;
-    sharedBuffer[bufferIndex].free = false;
-
-    //if we've reached the end of the file, end callback
-    if ((unsigned)readcount < framesPerBuffer) {
-        finished = true;
-        return paComplete;
-    }
-    return paContinue;
+int ofNextPow2(int x) {
+    if (x < 0)
+        return 0;
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
 }
 
 //
-// Returns PortAudio output device parameters
+// Code borrowed from openFrameworks sounds library. 
 //
-PaStreamParameters getStreamParams() {
-    PaStreamParameters params;
-    params.device = Pa_GetDefaultOutputDevice();
-    params.channelCount = OUT_CHANNELS;
-    params.sampleFormat = paFloat32;
-    params.suggestedLatency = Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
-    params.hostApiSpecificStreamInfo = NULL;
-    return params;
+float *getSoundSpectrum(int nBands){
+
+	// 	set to 0
+	for (int i = 0; i < 8192; i++){
+		fftInterpValues_[i] = 0;
+	}
+
+	// 	check what the user wants vs. what we can do:
+	if (nBands > 8192){
+		nBands = 8192;
+	} else if (nBands <= 0){
+		nBands = 1;
+		return fftInterpValues_;
+	}
+
+	// 	FMOD needs pow2
+	int nBandsToGet = ofNextPow2(nBands);
+	if (nBandsToGet < 64) nBandsToGet = 64;  // can't seem to get fft of 32, etc from fmodex
+
+	// 	get the fft
+	FMOD_System_GetSpectrum(system, fftSpectrum_, nBandsToGet, 0, FMOD_DSP_FFT_WINDOW_HANNING);
+
+	// 	convert to db scale
+	for(int i = 0; i < nBandsToGet; i++){
+        fftValues_[i] = 10.0f * (float)log10(1 + fftSpectrum_[i]) * 2.0f;
+	}
+
+	// 	try to put all of the values (nBandsToGet) into (nBands)
+	//  in a way which is accurate and preserves the data:
+	//
+
+	if (nBandsToGet == nBands){
+
+		for(int i = 0; i < nBandsToGet; i++){
+			fftInterpValues_[i] = fftValues_[i];
+		}
+
+	} else {
+
+		float step 		= (float)nBandsToGet / (float)nBands;
+		//float pos 		= 0;
+		// so for example, if nBands = 33, nBandsToGet = 64, step = 1.93f;
+		int currentBand = 0;
+
+		for(int i = 0; i < nBandsToGet; i++){
+
+			// if I am current band = 0, I care about (0+1) * step, my end pos
+			// if i > endPos, then split i with me and my neighbor
+
+			if (i >= ((currentBand+1)*step)){
+
+				// do some fractional thing here...
+				float fraction = ((currentBand+1)*step) - (i-1);
+				float one_m_fraction = 1 - fraction;
+				fftInterpValues_[currentBand] += fraction * fftValues_[i];
+				currentBand++;
+				// safety check:
+				if (currentBand >= nBands){
+                    printf("currentBand is bigger");
+				}
+
+				fftInterpValues_[currentBand] += one_m_fraction * fftValues_[i];
+
+			} else {
+				// do normal things
+				fftInterpValues_[currentBand] += fftValues_[i];
+			}
+		}
+
+		// because we added "step" amount per band, divide to get the mean:
+		for (int i = 0; i < nBands; i++){
+			fftInterpValues_[i] /= step;
+			if (fftInterpValues_[i] > 1)fftInterpValues_[i] = 1; 	// this seems "wrong"
+		}
+
+	}
+
+	return fftInterpValues_;
+}
+
+// Constructor
+//-------------------------------------------
+Audio::Audio() {
+    pan = 0;
+    volume = 1.0;
+    sampleRate = 44100;
+}
+
+// Destructor
+//-------------------------------------------
+Audio::~Audio() {
 }
 
 //
-// Open and read audio file. Initialize and start PortAudio stream
+// Initialize FMOD system
 //
-bool startAudio(PaStream *stream, const char* filename) {
+void Audio::initialize() {
+    FMOD_System_Create(&system);
+    FMOD_System_SetOutput(system, FMOD_OUTPUTTYPE_ALSA);
+    FMOD_System_Init(system, 32, FMOD_INIT_NORMAL, NULL);
+    FMOD_System_GetMasterChannelGroup(system, &channelGroup);
+}
 
-    //Open file
-    if ((sf.file = sf_open(filename, SFM_READ, &sf.info)) == NULL) {
-        printf("Error reading file");
+//
+// Close FMOD system
+//
+void Audio::close() {
+    FMOD_System_Close(system);
+}
+
+//
+//
+//
+bool Audio::loadFile(std::string fileName) {
+    result = FMOD_System_CreateSound(system, fileName.c_str(), FMOD_SOFTWARE | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
+
+    if (result != FMOD_OK) {
+        printf("Error loading %s\n", fileName.c_str());
         return false;
     }
-    PaError err = Pa_Initialize();
-    int samplerate = sf.info.samplerate;
-
-    buffer = new float[BUFFER_SIZE];
-    
-    //port audio initialize
-    if (err != paNoError) {
-        printf("PortAudio error: %s\n", Pa_GetErrorText(err));
-        return false;
-    }
-    PaStreamParameters outputParams = getStreamParams();
-
-    //open the stream
-    err = Pa_OpenStream(
-            &stream,
-            0,
-            &outputParams, 
-            samplerate, 
-            BUFFER,
-            paNoFlag,
-            paCallback,
-            NULL);
-    if (err != paNoError) {
-        printf("PortAudio error while opening stream: %s\n", Pa_GetErrorText(err));
-        return false;
-    }
-
-    err = Pa_StartStream(stream);
-    if (err != paNoError) {
-        printf("PortAudio error while starting stream: %s\n", Pa_GetErrorText(err));
-        return false;
-    }
+    FMOD_Sound_GetLength(sound, &length, FMOD_TIMEUNIT_PCM);
     return true;
 }
 
 //
-// End audio stream
 //
-void endAudio(PaStream *stream) {
-    Pa_StopStream(stream);
-    Pa_CloseStream(stream);
-    Pa_Terminate();
-    sf_close(sf.file);
-}
-
-float getSample() {
-    return sample;
-}
-
-int getOrderCount() {
-    return order;
-}
-
-float getAvgAmp() {
-    return averageAmp;
-}
-
-float* getBuffer() {
-    return buffer;
+//
+void Audio::play() {
+   FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, sound, 0, &channel);
+   //FMOD_Channel_GetFrequency(channel, &sampleRate);
+   FMOD_Channel_SetVolume(channel, 1);
+   FMOD_Channel_SetPan(channel, pan);
+   FMOD_Channel_SetFrequency(channel, sampleRate);
+   FMOD_Channel_SetMode(channel, FMOD_LOOP_OFF);
+   FMOD_System_Update(system);
+    
 }
 
 /*
-//
-// Simple main to test audio playback
-//
 int main(int argc, char *argv[]) {
-    PaStream *stream;
-    SF_Container infile; 
-    finished = false; 
-
-    if (argc != 2) {
-        printf("No sound file\n");
-        return EXIT_FAILURE; 
-    }
-
-    startAudio(&stream, argv[1]);
-    while (!finished);
-    endAudio(&stream);
-    return EXIT_SUCCESS;
+    Audio *a = new Audio();
+    a->initialize();
+    a->loadFile("sonic.wav");
+    for(;;)
+        a->play();
+    a->close();
 }
 */

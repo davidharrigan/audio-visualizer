@@ -5,6 +5,7 @@
 
 #include <GL/glut.h>
 #include <portaudio.h>
+#include <stdio.h>
 #include "Audio.h"
 
 #include "Point3.h"
@@ -13,19 +14,21 @@
 
 int windowWidth  = 640;
 int windowHeight = 480;
-extern Packet *sharedBuffer;
-PaStream* stream;
+//extern Packet *sharedBuffer;
+//PaStream* stream;
 Scene *scene;
+Audio *audio;
 
 //
 // Create a scene
 //
 void createScene(void) {
     scene = new Scene();
-    for (int i=0; i<6; i++) {
+    for (int i=0; i<20; i++) {
         Box *b = new Box();
-        b->setSize(0.3,0.5,0.5);
-        b->setLocation(1-i*0.5, 0, 0);
+        b->setSize(0.1,0.5,0.5);
+        b->setColor( new Color(0,0,0+(float)i*0.1));
+        b->setLocation(1-i*0.1, 0, 0);
         scene->addObject(b);
     }
 }
@@ -75,7 +78,7 @@ void redraw(void) {
 
 int main(int argc, char *argv[]) {
     int window;
-    sharedBuffer = (Packet*)malloc(sizeof(Packet) * BUFFER_SIZE);
+    //sharedBuffer = (Packet*)malloc(sizeof(Packet) * BUFFER_SIZE);
 
     if (argc != 2) {
         printf("No sound file\n");
@@ -88,13 +91,18 @@ int main(int argc, char *argv[]) {
     glutInitWindowSize(windowWidth, windowHeight);
     glutInitWindowPosition(100, 150);
     window = glutCreateWindow("Visualizer");
+
+    //Initialize audio components 
+    audio = new Audio();
+    audio->initialize();
+    if (!audio->loadFile(argv[1])) {
+        return EXIT_FAILURE;
+    }
     
     glutDisplayFunc(redraw);
     appInit();
 
-    // start audio stream
-    startAudio(&stream, argv[1]);
+    audio->play();
     glutMainLoop();
-    endAudio(&stream);
     return EXIT_SUCCESS;
 }

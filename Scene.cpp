@@ -11,7 +11,7 @@
 #include <GL/glui.h>
 #include "Audio.h"
 
-Packet *sharedBuffer;
+//Packet *sharedBuffer;
 int bufferIndex;
 
 // Constructors
@@ -48,13 +48,16 @@ void Scene::redraw() {
     //glScalef(0.5, 0.5, 2.0);
     std::vector<Object3D*>::iterator it;
     int i;
-    float* buffer = getBuffer();
+ //   float* bufferIn = getBuffer();
+   // float* buffer;
+    float* samples = getSoundSpectrum(1024);
+    //PowerSpectrum(256, bufferIn, buffer);
     for (i=0, it = objects.begin(); it != objects.end(); i++, it++) {
-        float freq = buffer[i+50];
-        freq *= 0.96;
-        if (freq < buffer[i+40]) 
-            freq = buffer[i+40];
-          (*it)->redraw(freq);
+        float freq = samples[i];
+        freq *= 0.96; // make fft smoother
+        if (freq < samples[i]) 
+            freq = samples[i];
+        (*it)->redraw(freq);
     }
     //glClearColor(0.5, 0.5, getAvgAmp()*0.6, 0.5);
     
