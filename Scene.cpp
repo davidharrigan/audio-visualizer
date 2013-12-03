@@ -18,7 +18,6 @@ int bufferIndex;
 // ------------------------------------------------------------------
 
 Scene::Scene() {
-    fftObject = new fft();
     bufferIndex = 0;
 }
 
@@ -57,5 +56,7 @@ void Scene::redraw() {
             freq = buffer[i+40];
           (*it)->redraw(freq);
     }
+    //glClearColor(0.5, 0.5, getAvgAmp()*0.6, 0.5);
+    
 }
 

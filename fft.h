@@ -6,6 +6,9 @@
 #define	M_PI		3.14159265358979323846  /* pi */
 #endif
 
+void PowerSpectrum(int, float*, float*);
+void InitFFT();
+void RealFFT(int, float*, float*, float*);
 
 class fft {
 	

@@ -342,7 +342,7 @@ void PowerSpectrum(int NumSamples, float *In, float *Out)
 
    delete[]tmpReal;
    delete[]tmpImag;
-   delete[]RealOut;
+//   delete[]RealOut;
    delete[]ImagOut;
 }
 
