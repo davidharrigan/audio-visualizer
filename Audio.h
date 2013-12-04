@@ -11,6 +11,7 @@
 
 // Global functions
 float *getSoundSpectrum(int);
+float *getSpectrum();
 
 class Audio {
 

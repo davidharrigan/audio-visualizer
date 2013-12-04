@@ -12,8 +12,8 @@
 #include "Scene.h"
 #include "Box.h"
 
-int windowWidth  = 640;
-int windowHeight = 480;
+int windowWidth  = 1280;
+int windowHeight = 960;
 //extern Packet *sharedBuffer;
 //PaStream* stream;
 Scene *scene;
@@ -24,11 +24,12 @@ Audio *audio;
 //
 void createScene(void) {
     scene = new Scene();
-    for (int i=0; i<20; i++) {
+    float size = 2 / 64;
+    for (int i=0; i<64; i++) {
         Box *b = new Box();
-        b->setSize(0.1,0.5,0.5);
-        b->setColor( new Color(0,0,0+(float)i*0.1));
-        b->setLocation(1-i*0.1, 0, 0);
+        b->setSize(0.03,0.5, 0.03);
+        b->setColor( new Color(0,0,0+(float)i*0.01));
+        b->setLocation(1-i*0.03, 0, 0);
         scene->addObject(b);
     }
 }
@@ -65,9 +66,12 @@ void appInit(void) {
 //
 void redraw(void) {
     glutPostRedisplay();
+    GLfloat ambient[] = {0.2, 0.2, 0.2, 1};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+    glLightfv(1, GL_POSITION, ambient);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,3,10,
+    gluLookAt(4,7,10,
               0,0,0,
               0,1,0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

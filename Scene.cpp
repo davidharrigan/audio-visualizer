@@ -44,21 +44,27 @@ void Scene::clear() {
 // Redraws the scene
 //
 void Scene::redraw() {
-    //glTranslatef(0.5, 0.5, 0.0);
+    glTranslatef(0, -1, 0.0);
     //glScalef(0.5, 0.5, 2.0);
     std::vector<Object3D*>::iterator it;
     int i;
- //   float* bufferIn = getBuffer();
    // float* buffer;
-    float* samples = getSoundSpectrum(1024);
+    float* samples = getSoundSpectrum(100);
+    float ampAvg = 0;
+    //float* samples = getSpectrum();
     //PowerSpectrum(256, bufferIn, buffer);
     for (i=0, it = objects.begin(); it != objects.end(); i++, it++) {
         float freq = samples[i];
         freq *= 0.96; // make fft smoother
         if (freq < samples[i]) 
             freq = samples[i];
+        ampAvg += freq;
         (*it)->redraw(freq);
     }
+    ampAvg /= i;
+    //float hzRange = (44100 / 2) / *samples;
+    glClearColor(0.5,0.5, ampAvg, 1);
+    //delete samples;
     //glClearColor(0.5, 0.5, getAvgAmp()*0.6, 0.5);
     
 }

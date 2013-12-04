@@ -3,7 +3,7 @@
 # 
 
 PROG = visualizer
-MYCPPFLAGS = -std=c++11    
+MYCPPFLAGS = -std=c++11
 
 # -------------------- set system-dependent variables ----------------
 CC          = gcc 
@@ -17,7 +17,8 @@ GL_LIBS     = -lglui -lglut -lGLU -lGL
 MAKEFILE    = Makefile
 X_INC       = -I/usr/X11/include
 XLIBS       = -L/usr/X11/lib 
-LIBS = $(XLIBS) $(GL_LIBS) -lportaudio -lsndfile -ljack -lrt -lasound
+LIBS = $(XLIBS) $(GL_LIBS) -lfmodex 
+#-lportaudio -lsndfile -ljack -lrt -lasound
 
 # -------------- Compiler and Linker flags ---------------
 CPPFLAGS    = -Wall $(MYCPPFLAGS) $(GL_INC) $(X_INC) 
