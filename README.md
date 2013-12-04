@@ -1,5 +1,6 @@
 audio-visualizer
 ================
 
-dependencies:
-fmodex - audio playback and FFT helper functions
+OpenGL based audio visualizer. 
+
+Uses FMOD for audio processing. 
