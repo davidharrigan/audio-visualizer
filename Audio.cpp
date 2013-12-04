@@ -4,9 +4,6 @@
 #include <math.h>
 #include <algorithm>
 
-static FMOD_CHANNELGROUP *channelGroup;
-static FMOD_SYSTEM *sys;
-
 float fftValues_[8192];			//
 float fftInterpValues_[8192];			//
 float fftSpectrum_[8192];		// maximum #ofFmodSoundPlayer is 8192, in fmodex....
@@ -126,14 +123,11 @@ float *getSoundSpectrum(int nBands){
 float* getSpectrum() {
     int sampleSize = 64;
     float *specLeft, *specRight;
-
     specLeft = new float[sampleSize];
     specRight = new float[sampleSize];
-    
+    float *spec = new float[sampleSize];
 	FMOD_System_GetSpectrum(sys, specLeft, sampleSize, 0, FMOD_DSP_FFT_WINDOW_RECT);
 	FMOD_System_GetSpectrum(sys, specRight, sampleSize, 1, FMOD_DSP_FFT_WINDOW_RECT);
-    float *spec = new float[sampleSize];
-
     // Average volume
     for (int i=0; i<sampleSize; i++) 
         spec[i] = (specLeft[i] + specRight[i]) / 2;

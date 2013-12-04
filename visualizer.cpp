@@ -12,6 +12,8 @@
 #include "Scene.h"
 #include "Box.h"
 
+#include <math.h>
+
 int windowWidth  = 1280;
 int windowHeight = 960;
 //extern Packet *sharedBuffer;
@@ -24,12 +26,14 @@ Audio *audio;
 //
 void createScene(void) {
     scene = new Scene();
-    float size = 2 / 64;
-    for (int i=0; i<64; i++) {
+    float numBars = 64;
+    float size = 2.0 / numBars;
+    printf("%f\n", size);
+    for (int i=0; i<numBars; i++) {
         Box *b = new Box();
-        b->setSize(0.03,0.5, 0.03);
+        b->setSize(size,0.5, size);
         b->setColor( new Color(0,0,0+(float)i*0.01));
-        b->setLocation(1-i*0.03, 0, 0);
+        b->setLocation(1-i*size, 0, 0);
         scene->addObject(b);
     }
 }

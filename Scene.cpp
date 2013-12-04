@@ -7,6 +7,7 @@
 
 #include "Scene.h"
 
+#include <fmodex/fmod.h>
 #include <iostream>
 #include <GL/glui.h>
 #include "Audio.h"
@@ -45,19 +46,18 @@ void Scene::clear() {
 //
 void Scene::redraw() {
     glTranslatef(0, -1, 0.0);
-    //glScalef(0.5, 0.5, 2.0);
-    std::vector<Object3D*>::iterator it;
+    std::vector<Object3D*>::reverse_iterator it;
     int i;
-   // float* buffer;
-    float* samples = getSoundSpectrum(100);
     float ampAvg = 0;
+    int sampleSize = 8192;;
+    float* samples = getSoundSpectrum(sampleSize);
     //float* samples = getSpectrum();
-    //PowerSpectrum(256, bufferIn, buffer);
-    for (i=0, it = objects.begin(); it != objects.end(); i++, it++) {
+    
+    for (i=10, it = objects.rbegin(); it != objects.rend(); i++, it++) {
         float freq = samples[i];
-        freq *= 0.96; // make fft smoother
+        /*freq *= 0.9; // make fft smoother
         if (freq < samples[i]) 
-            freq = samples[i];
+            freq = samples[i];*/
         ampAvg += freq;
         (*it)->redraw(freq);
     }
@@ -66,6 +66,5 @@ void Scene::redraw() {
     glClearColor(0.1,0.5, ampAvg*1.5, 1);
     //delete samples;
     //glClearColor(0.5, 0.5, getAvgAmp()*0.6, 0.5);
-    
 }
 
