@@ -66,9 +66,16 @@ void appInit(void) {
 //
 void redraw(void) {
     glutPostRedisplay();
-    GLfloat ambient[] = {0.2, 0.2, 0.2, 1};
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
-    glLightfv(1, GL_POSITION, ambient);
+    GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
+    GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
+    GLfloat specular[4] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat location[4] = {-2.0, 1.5, 0.5, 1.0};
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT1, GL_POSITION, location);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
+    glEnable(GL_LIGHT1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(4,7,10,

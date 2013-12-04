@@ -63,7 +63,7 @@ void Scene::redraw() {
     }
     ampAvg /= i;
     //float hzRange = (44100 / 2) / *samples;
-    glClearColor(0.5,0.5, ampAvg, 1);
+    glClearColor(0.1,0.5, ampAvg*1.5, 1);
     //delete samples;
     //glClearColor(0.5, 0.5, getAvgAmp()*0.6, 0.5);
     
