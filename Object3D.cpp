@@ -21,6 +21,18 @@ Object3D::Object3D() {
 // Destructor
 Object3D::~Object3D() { }
 
+void Object3D::moveUp() {
+    zLoc -= zSize;
+    if( ySize > 0.01) 
+        ySize -= 0.001;
+    trans -= 0.01;
+}
+
+void Object3D::reset(int loc) {
+    //zLoc = loc*zSize;
+    zLoc = 2;
+}
+
 //
 // set the location of the object to the x,y,z position defined by the args
 //

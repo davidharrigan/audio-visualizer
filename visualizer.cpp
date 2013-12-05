@@ -13,6 +13,7 @@
 #include "Box.h"
 
 #include <math.h>
+#include <unistd.h>
 
 int windowWidth  = 1280;
 int windowHeight = 960;
@@ -26,26 +27,6 @@ Audio *audio;
 //
 void createScene(void) {
     scene = new Scene();
-    float numBars = 100;
-    float size = 2.0 / numBars;
-    printf("%f\n", size);
-    for (int i=0; i<numBars; i++) {
-        Box *b = new Box();
-        b->setSize(size,0.5, size);
-        b->setColor( new Color(0,0,0+(float)i*0.01));
-        b->setLocation(1-i*size, 0, 0);
-        scene->addObject(b);
-    }
-
-    numBars = 200;
-    size = 2.0 / numBars;
-    for (int i=0; i<numBars; i++) {
-        Box *b = new Box();
-        b->setSize(size,0.5, size);
-        b->setColor( new Color((float)i*0.01,0.1,0.2));
-        b->setLocation(1-i*size, 0, 0);
-        scene->addObject2(b);
-    }
 }
 
 //
@@ -80,6 +61,7 @@ void appInit(void) {
 //
 void redraw(void) {
     glutPostRedisplay();
+    //glutTimerFunc(30, redraw, -1);    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
     GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
@@ -93,7 +75,7 @@ void redraw(void) {
     glEnable(GL_LIGHT1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(4,7,10,
+    gluLookAt(0,5,16,
               0,0,0,
               0,1,0);
     scene->redraw();

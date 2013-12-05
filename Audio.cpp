@@ -45,7 +45,6 @@ float *getSoundSpectrum(int nBands){
 	int nBandsToGet = ofNextPow2(nBands);
 	if (nBandsToGet < 64) nBandsToGet = 64;  // can't seem to get fft of 32, etc from fmodex
 
-    float *specLeft, *specRight;
 	// 	get the fft
 	FMOD_System_GetSpectrum(sys, fftSpectrum_, nBandsToGet, 0, FMOD_DSP_FFT_WINDOW_HANNING);
 
@@ -116,12 +115,27 @@ float *getSoundSpectrum(int nBands){
 		}
 
 	}
+    /*
+    //Find max volume
+    auto maxIterator = std::max_element(
+            &fftInterpValues_[0], 
+            &fftInterpValues_[nBands]);
+    float maxVol = *maxIterator;
 
+    //Normalize
+    if (maxVol !=0)
+        std::transform(&fftInterpValues_[0], 
+                       &fftInterpValues_[nBands], 
+                       &fftInterpValues_[0], 
+                       [maxVol] (float dB)->float {return dB / maxVol;});
+
+    */
 	return fftInterpValues_;
 }
 
 float* getSpectrum() {
-    int sampleSize = 64;
+    int sampleSize = 1024;
+    /*
     float *specLeft, *specRight;
     specLeft = new float[sampleSize];
     specRight = new float[sampleSize];
@@ -132,17 +146,12 @@ float* getSpectrum() {
     for (int i=0; i<sampleSize; i++) 
         spec[i] = (specLeft[i] + specRight[i]) / 2;
     
-    //Find max volume
-    auto maxIterator = std::max_element(&spec[0], &spec[sampleSize]);
-    float maxVol = *maxIterator;
-
-    //Normalize
-    if (maxVol !=0)
-        std::transform(&spec[0], &spec[sampleSize], &spec[0], [maxVol] (float dB)->float {return dB / maxVol;});
 
     delete specLeft;
     delete specRight;
-    return spec;
+    */
+    FMOD_System_GetSpectrum(sys, fftInterpValues_, sampleSize, 0, FMOD_DSP_FFT_WINDOW_RECT);
+    return fftInterpValues_;
 }
 
 // Constructor

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <GL/glui.h>
 #include "Audio.h"
+#include "Box.h"
 
 //Packet *sharedBuffer;
 int bufferIndex;
@@ -19,7 +20,22 @@ int bufferIndex;
 // ------------------------------------------------------------------
 
 Scene::Scene() {
-    bufferIndex = 0;
+    curLine = 0;
+    sampleSize = 1600; //2028, 4096, and 8192 are good
+    steps = 4;
+    numBars = 22;
+    float size = 2.0 / (numBars*6);
+    for (int i=0; i<numBars*2; i++) {
+        std::vector<Object3D*>* temp = new std::vector<Object3D*>();
+        for (int j=0; j<numBars; j++) {
+            Box *b = new Box();
+            b->setSize(size, 0, size);
+            b->setColor(new Color(1,1,1));
+            b->setLocation(1-j*size*6, 0, 1-i*size);
+            temp->push_back(b); 
+        }
+        lines.push_back(temp);
+    }
 }
 
 
@@ -27,73 +43,51 @@ Scene::Scene() {
 // ------------------------------------------------------------------
 
 //
-// adds an object to the vector
-//
-void Scene::addObject(Object3D *newObject) {
-    objects.push_back(newObject);
-}
-
-void Scene::addObject2(Object3D *newObject) {
-    objects2.push_back(newObject);
-}
-
-//
-// clears the object vector
-//
-void Scene::clear() {
-    objects.clear();
-    redraw();
-}
-
-//
 // Redraws the scene
 //
 void Scene::redraw() {
-    glTranslatef(0, -1, 0.0);
+    if (curLine >= lines.size())
+        curLine = 0;
+    glTranslatef(0, 0, 1);
+    std::vector<Object3D*> objects = *lines[curLine];
     std::vector<Object3D*>::reverse_iterator it;
-    std::vector<Object3D*>::iterator it2;
+    std::vector<std::vector<Object3D*>* >::iterator itt;
     int i;
     float ampAvg = 0;
-    //2028, 4096, and 8192 are good
-    int sampleSize = 4096;
     float* samples = getSoundSpectrum(sampleSize);
     //float* samples = getSpectrum();
-    int steps = sampleSize / 12 / 100;
-    //printf("steps: %d", steps);
-    //int steps = 1; 
-    for (i=10, it = objects.rbegin(); it != objects.rend(); i+=steps, it++) {
+
+    // move up all lines
+    for (i=0, itt=lines.begin(); itt != lines.end(); itt++, i++) {
+        for (it=(*itt)->rbegin(); i==curLine, it!=(*itt)->rend(); it++) {
+            (*it)->moveUp();
+            (*it)->redraw(-1);
+        }
+    }
+    
+    for (i=0, it = objects.rbegin(); it != objects.rend(); i+=steps, it++) {
         float freq = 0;
+        float highest = -1;
         for (int j=0; j<steps; j++) {
+            if (highest < samples[i+j])
+                highest = samples [i+j];
             freq += samples[i + j];
         }
+        freq += highest;
+        
+        freq /= steps+1;
         ampAvg += freq;
-        freq /= steps;
-        /*freq *= 0.9; // make fft smoother
-        if (freq < samples[i]) 
-            freq = samples[i];*/
-        (*it)->redraw(freq);
-    }
-
-    ampAvg /= i;
-    glTranslatef(0,-0.005,0);
-    glRotatef(90,1,0,0);
-    //glTranslatef(0.01,0,0.01);
-    for (it=objects2.rbegin(); it != objects2.rend(); i+=steps, it++) {
-        float freq = 0;
-        for (int j=0; j<steps; j++) {
-            freq += samples[i + j];
-        }
-    //dd    ampAvg += freq;
-        freq /= steps;
-        /*freq *= 0.9; // make fft smoother
-        if (freq < samples[i]) 
-            freq = samples[i];*/
+        (*it)->reset(i);
         (*it)->redraw(freq);
 
+        Box b = Box();
     }
-    //float hzRange = (44100 / 2) / *samples;
-    glClearColor(0.1,0.5, ampAvg*1.6, 1);
+    float beat;
+    for (i=0; i<40; i++) 
+        beat += samples[i];
+        
+    beat /= i;
+    glClearColor(0.1,0.5, beat*1.6, 1.0);
+    curLine++;
     //delete samples;
-    //glClearColor(0.5, 0.5, getAvgAmp()*0.6, 0.5);
 }
-

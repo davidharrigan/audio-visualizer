@@ -16,6 +16,8 @@ public:
     void setSize(float xs, float ys, float zs);   
     void setRotate(float angle, float dx, float dy, float dz);
     void setColor(Color* c);
+    void moveUp();
+    void reset(int);
 
     // Getters 
     Point3* getLocation();             
@@ -28,6 +30,7 @@ protected:
     float xSize, ySize, zSize;     // size of the object
     float angle, dxRot, dyRot, dzRot; // rotation angle and axis
     Color* color;
+    float trans;
 };
 
 #endif /*OBJECT3D_H_*/

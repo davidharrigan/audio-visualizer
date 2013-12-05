@@ -12,10 +12,13 @@ public:
     virtual ~Box();
    
     virtual void redraw(float);
+    void moveUp();
    
 protected:
 
+    Box *b;
     float length;
+    Color colors[3];
 };
 
 #endif /*BOX_H_*/
