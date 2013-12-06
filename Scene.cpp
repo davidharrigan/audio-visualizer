@@ -11,7 +11,7 @@
 #include <iostream>
 #include <GL/glui.h>
 #include "Audio.h"
-#include "Box.h"
+#include "VBar.h"
 
 //Packet *sharedBuffer;
 int bufferIndex;
@@ -26,13 +26,14 @@ Scene::Scene() {
     numBars = 22;
     float size = 2.0 / (numBars*6);
     for (int i=0; i<numBars*2; i++) {
-        std::vector<Object3D*>* temp = new std::vector<Object3D*>();
+        std::vector<VBar*>* temp = new std::vector<VBar*>();
         for (int j=0; j<numBars; j++) {
-            Box *b = new Box();
-            b->setSize(size, 0, size);
-            b->setColor(new Color(1,1,1));
+            VBar *b = new VBar();
+            b->setSize(size, 0, size*4);
+           // b->setColor(new Color(1,1,1));
             b->setLocation(1-j*size*6, 0, 1-i*size);
             temp->push_back(b); 
+            b->createChildren(20);
         }
         lines.push_back(temp);
     }
@@ -49,9 +50,9 @@ void Scene::redraw() {
     if (curLine >= lines.size())
         curLine = 0;
     glTranslatef(0, 0, 1);
-    std::vector<Object3D*> objects = *lines[curLine];
-    std::vector<Object3D*>::reverse_iterator it;
-    std::vector<std::vector<Object3D*>* >::iterator itt;
+    std::vector<VBar*> objects = *lines[curLine];
+    std::vector<VBar*>::reverse_iterator it;
+    std::vector<std::vector<VBar*>* >::iterator itt;
     int i;
     float ampAvg = 0;
     float* samples = getSoundSpectrum(sampleSize);
@@ -61,7 +62,7 @@ void Scene::redraw() {
     for (i=0, itt=lines.begin(); itt != lines.end(); itt++, i++) {
         for (it=(*itt)->rbegin(); i==curLine, it!=(*itt)->rend(); it++) {
             (*it)->moveUp();
-            (*it)->redraw(-1);
+            (*it)->redraw();
         }
     }
     
@@ -77,17 +78,18 @@ void Scene::redraw() {
         
         freq /= steps+1;
         ampAvg += freq;
-        (*it)->reset(i);
-        (*it)->redraw(freq);
+        (*it)->setHeight(freq);
+        (*it)->reset();
+        (*it)->redraw();
 
-        Box b = Box();
+        VBar b = VBar();
     }
     float beat;
     for (i=0; i<40; i++) 
         beat += samples[i];
         
     beat /= i;
-    glClearColor(0.1,0.5, beat*1.6, 1.0);
+    //glClearColor(0.1,0.5, beat*1.6, 1.0);
     curLine++;
     //delete samples;
 }

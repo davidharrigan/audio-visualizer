@@ -66,7 +66,7 @@ void redraw(void) {
     GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
     GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat specular[4] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat location[4] = {-2.0, 1.5, 0.5, 1.0};
+    GLfloat location[4] = {-2.0, 1.5, -1.0, 1.0};
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
     glLightfv(GL_LIGHT1, GL_POSITION, location);
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);

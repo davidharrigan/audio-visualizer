@@ -10,20 +10,20 @@
 #include <vector>
 #include <string>
 #include <GL/glut.h>
-#include "Object3D.h"
+#include "VBar.h"
 #include "Audio.h"
 
 class Scene {
 public:
     Scene();
 
-    void addObject( Object3D* object );
+    void addObject( VBar* object );
     void clear();
     void redraw();
     
 protected:
     //objects collection
-    std::vector<std::vector<Object3D*>*> lines;
+    std::vector<std::vector<VBar*>*> lines;
     
     int sampleSize; 
     int steps; 
