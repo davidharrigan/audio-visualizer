@@ -1,4 +1,5 @@
 #include "VBar.h"
+#include <math.h>
 
 // Constructor
 //----------------------------------------------------
@@ -38,9 +39,9 @@ void VBar::setHeight(float freq) {
     if (ySize > 1) ySize = 1; //limit the max height
 
     // decide color
-    if (freq < 0.01) {
+    if (freq < 0.05) {
         ySize = 0;
-        color->set(0.2, 0.1, 0.8);
+        color->set(0, 0, 0.6);
         tempCount = 0;
     }
     else if(freq < 0.3) {
@@ -57,20 +58,25 @@ void VBar::setHeight(float freq) {
         color->set(0.4 * freq * 1.2, 
                    1.0 * freq * 2, 
                    1.0);
-        tempCount = 14;
+        tempCount = 12;
     }
     else {
         color->set(0.7 * freq, 0.3 * freq, 0.0);
-        tempCount = 20;
+        tempCount = 16;
     }
 
-    if (children.size() > 0)
-        childCount = tempCount;
+    if (children.size() > 0 && freq > 0.05) {
+        childCount = (freq *20);
+        //childCount = tempCount;
+    } else {
+        childCount = 0;
+    }
 
     int i;
-    float offset = 0.01 * freq;
+    //float offset = 0.01 * freq;
+    float offset = 0.02;
     for (i=1, iter = children.begin(); i < childCount+1; iter++, i++)
-       (*iter)->setHeight(freq - (float)(offset*i)*(i+1.2));
+       (*iter)->setHeight((freq-offset*(i*1.4)));
 }
 
 void VBar::moveUp() {
@@ -112,7 +118,7 @@ void VBar::createChildren(int maxChildren) {
     for (int i=1; i<maxChildren+1; i++) {
         VBar *v = new VBar();
         v->setLocation(xLoc, yLoc, zLoc);
-        v->setSize(xSize+(xSize*(i+1)*0.75), ySize, zSize*(i+1)*0.75);
+        v->setSize(xSize+(xSize*(i+1)*1.5), ySize, zSize*(i+1)*1.5);
         children.push_back(v);
     }
 }
