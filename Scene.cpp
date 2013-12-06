@@ -11,7 +11,7 @@
 #include <iostream>
 #include <GL/glui.h>
 #include "Audio.h"
-#include "VBar.h"
+#include "Box.h"
 
 //Packet *sharedBuffer;
 int bufferIndex;
@@ -20,22 +20,25 @@ int bufferIndex;
 // ------------------------------------------------------------------
 
 Scene::Scene() {
-    curLine = 0;
-    sampleSize = 1600; //2028, 4096, and 8192 are good
-    steps = 4;
-    numBars = 22;
-    float size = 2.0 / (numBars*6);
-    for (int i=0; i<numBars*2; i++) {
-        std::vector<VBar*>* temp = new std::vector<VBar*>();
-        for (int j=0; j<numBars; j++) {
-            VBar *b = new VBar();
-            b->setSize(size, 0, size*4);
-           // b->setColor(new Color(1,1,1));
-            b->setLocation(1-j*size*6, 0, 1-i*size);
-            temp->push_back(b); 
-            b->createChildren(20);
-        }
-        lines.push_back(temp);
+    sampleSize = 4096; //2028, 4096, and 8192 are good
+    steps = 3;
+    numBars = 100;
+    float size = 2.0 / numBars;
+    for (int i=0; i<numBars; i++) {
+        Box *b = new Box();
+        b->setSize(size, 0, size);
+        b->setColor(new Color(0,0,0));
+        b->setLocation(1-i*size, 0, 0);
+        objects.push_back(b);
+    }
+    numBars = 200;
+    size = 2.0 / numBars;
+    for (int i=0; i<numBars; i++) {
+        Box *b = new Box();
+        b->setSize(size, 0, size);
+        b->setColor(new Color(0,0,0));
+        b->setLocation(1-i*size, 0, 0);
+        objects2.push_back(b);
     }
 }
 
@@ -47,49 +50,31 @@ Scene::Scene() {
 // Redraws the scene
 //
 void Scene::redraw() {
-    if (curLine >= lines.size())
-        curLine = 0;
-    glTranslatef(0, 0, 1);
-    std::vector<VBar*> objects = *lines[curLine];
-    std::vector<VBar*>::reverse_iterator it;
-    std::vector<std::vector<VBar*>* >::iterator itt;
+    glTranslatef(0, -1, 0);
     int i;
     float ampAvg = 0;
     float* samples = getSoundSpectrum(sampleSize);
-    //float* samples = getSpectrum();
 
-    // move up all lines
-    for (i=0, itt=lines.begin(); itt != lines.end(); itt++, i++) {
-        for (it=(*itt)->rbegin(); i==curLine, it!=(*itt)->rend(); it++) {
-            (*it)->moveUp();
-            (*it)->redraw();
-        }
-    }
-    
-    for (i=0, it = objects.rbegin(); it != objects.rend(); i+=steps, it++) {
+    for (i=10, it = objects.rbegin(); it != objects.rend(); i+=steps, it++) {
         float freq = 0;
-        float highest = -1;
         for (int j=0; j<steps; j++) {
-            if (highest < samples[i+j])
-                highest = samples [i+j];
             freq += samples[i + j];
+            ampAvg += freq;
         }
-        freq += highest;
-        
-        freq /= steps+1;
-        ampAvg += freq;
-        (*it)->setHeight(freq);
-        (*it)->reset();
-        (*it)->redraw();
-
-        VBar b = VBar();
+        freq /= steps;
+        (*it)->redraw(freq);
     }
-    float beat;
-    for (i=0; i<40; i++) 
-        beat += samples[i];
-        
-    beat /= i;
-    //glClearColor(0.1,0.5, beat*1.6, 1.0);
-    curLine++;
-    //delete samples;
+    ampAvg /= i;
+    glTranslatef(0,-0.005,0);
+    glRotatef(90,1,0,0);
+   
+    for (it=objects2.rbegin(); it != objects2.rend(); i+= steps, it++) {
+        float freq = 0;
+        for (int j=0; j<steps; j++) 
+            freq += samples[i + j];
+
+        freq /= steps; 
+        (*it)->redraw(freq);
+    }
+    glClearColor(0,0, ampAvg*0.2, 1.0);
 }

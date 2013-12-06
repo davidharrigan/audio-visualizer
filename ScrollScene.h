@@ -1,31 +1,29 @@
 /**
- * Scene.h - a class represent a scene: its objects and its view
+ * ScrollScene.h - a class represent a scene: its objects and its view
  * 
  * dtk24 - David Harrigan
  * CS770 - Fall 2013
  */
-#ifndef SCENE_H_
-#define SCENE_H_
+#ifndef SCROLL_SCENE_H_
+#define SCROLL_SCENE_H_
 
 #include <vector>
 #include <string>
 #include <GL/glut.h>
-#include "Box.h"
+#include "VBar.h"
 #include "Audio.h"
 
-class Scene {
+class ScrollScene {
 public:
-    Scene();
+    ScrollScene();
 
-    void addObject( Box* object );
+    void addObject( VBar* object );
     void clear();
     void redraw();
     
 protected:
     //objects collection
-    std::vector<Box*> objects;
-    std::vector<Box*> objects2;
-    std::vector<Box*>::reverse_iterator it;
+    std::vector<std::vector<VBar*>*> lines;
     
     int sampleSize; 
     int steps; 

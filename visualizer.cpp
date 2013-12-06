@@ -10,6 +10,7 @@
 
 #include "Point3.h"
 #include "Scene.h"
+#include "ScrollScene.h"
 #include "Box.h"
 
 #include <math.h>
@@ -19,6 +20,7 @@ int windowWidth  = 1280;
 int windowHeight = 960;
 //extern Packet *sharedBuffer;
 //PaStream* stream;
+//Scene *scene;
 Scene *scene;
 Audio *audio;
 
@@ -27,6 +29,8 @@ Audio *audio;
 //
 void createScene(void) {
     scene = new Scene();
+//    scene = new ScrollScene();
+    
 }
 
 //
@@ -43,7 +47,7 @@ void reshape(int w, int h) {
 // Initialize OpenGL components
 //
 void appInit(void) {
-    glClearColor(0.5,0.5,0.5,0.0);
+    glClearColor(0,0,0,0.0);
     glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
@@ -75,7 +79,7 @@ void redraw(void) {
     glEnable(GL_LIGHT1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,5,16,
+    gluLookAt(8,5,16,
               0,0,0,
               0,1,0);
     scene->redraw();
