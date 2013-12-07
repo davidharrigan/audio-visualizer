@@ -20,17 +20,16 @@ int windowWidth  = 1280;
 int windowHeight = 960;
 //extern Packet *sharedBuffer;
 //PaStream* stream;
-//Scene *scene;
-Scene *scene;
+ScrollScene *scene;
+ScrollScene *scrollScene;
 Audio *audio;
 
 //
 // Create a scene
 //
 void createScene(void) {
-    scene = new Scene();
-//    scene = new ScrollScene();
-    
+    scene = new ScrollScene();
+     //scene = new Scene(); 
 }
 
 //
@@ -79,7 +78,7 @@ void redraw(void) {
     glEnable(GL_LIGHT1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(8,5,16,
+    gluLookAt(3,5,16,
               0,0,0,
               0,1,0);
     scene->redraw();

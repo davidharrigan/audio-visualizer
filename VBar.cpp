@@ -6,7 +6,7 @@
 VBar::VBar() {
     xLoc = yLoc = zLoc = 0;
     xSize = ySize = zSize = 0;
-    opacity = 1;
+    opacity = 0.8;
     color = new Color(0,0,0);
     childCount = 0;
 }
@@ -41,7 +41,8 @@ void VBar::setHeight(float freq) {
     // decide color
     if (freq < 0.05) {
         ySize = 0;
-        color->set(0, 0, 0.6);
+        color->set(0, 0, 0);
+        opacity = 0;
         tempCount = 0;
     }
     else if(freq < 0.3) {
@@ -61,12 +62,12 @@ void VBar::setHeight(float freq) {
         tempCount = 12;
     }
     else {
-        color->set(0.7 * freq, 0.3 * freq, 0.0);
+        color->set(0.7 * freq, 0.4 * freq, 0.2);
         tempCount = 16;
     }
 
     if (children.size() > 0 && freq > 0.05) {
-        childCount = (freq *20);
+        childCount = (freq *6) ;
         //childCount = tempCount;
     } else {
         childCount = 0;
@@ -76,12 +77,12 @@ void VBar::setHeight(float freq) {
     //float offset = 0.01 * freq;
     float offset = 0.02;
     for (i=1, iter = children.begin(); i < childCount+1; iter++, i++)
-       (*iter)->setHeight((freq-offset*(i*1.4)));
+       (*iter)->setHeight(freq-offset*i);
 }
 
 void VBar::moveUp() {
     zLoc -= zSize;
-    opacity -= 0.001;
+    opacity -= 0.2;
 
     int i;
     for (i=0, iter = children.begin(); i < childCount; i++, iter++)
@@ -102,16 +103,19 @@ void VBar::reset() {
 }
 
 void VBar::redraw() {
-    glPushMatrix();
-        glColor4f(color->r, color->g, color->b, opacity);
-        glTranslatef(xLoc, yLoc + (ySize/2), zLoc);
-        glScalef(xSize, ySize, zSize);
-        glutSolidCube(1);
-    glPopMatrix();
-  
+    if (ySize > 0) {
+        glPushMatrix();
+            glColor3f(color->r, color->g, color->b);
+            glTranslatef(xLoc, yLoc + (ySize/2), zLoc);
+            glScalef(xSize, ySize, zSize);
+            //glutSolidDodecahedron();
+        glPopMatrix();
+    }
+ /* 
     int i;
     for (i=0, iter = children.begin(); i < childCount; i++, iter++)
        (*iter)->redraw();
+       */
 }
 
 void VBar::createChildren(int maxChildren) {

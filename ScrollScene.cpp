@@ -22,9 +22,9 @@ ScrollScene::ScrollScene() {
     curLine = 0;
     sampleSize = 1600; //2028, 4096, and 8192 are good
     steps = 6;
-    numBars = 22;
-    float size = 2.0 / (numBars*6);
-    for (int i=0; i<numBars*2; i++) {
+    numBars = 33;
+    float size = 2.0 / (numBars*10);
+    for (int i=0; i<numBars*3; i++) {
         std::vector<VBar*>* temp = new std::vector<VBar*>();
         for (int j=0; j<numBars; j++) {
             VBar *b = new VBar();
@@ -32,7 +32,7 @@ ScrollScene::ScrollScene() {
            // b->setColor(new Color(1,1,1));
             b->setLocation(1-j*size*6, 0, 1-i*size);
             temp->push_back(b); 
-            b->createChildren(20);
+            b->createChildren(10);
         }
         lines.push_back(temp);
     }
@@ -48,14 +48,8 @@ ScrollScene::ScrollScene() {
 void ScrollScene::redraw() {
     if (curLine >= lines.size())
         curLine = 0;
-    glPushMatrix();
-        glColor4f(0,0,0.6,1);
-        glTranslatef(0,-0.1,1.4);
-        glScalef(3,0.01,3);
-        glutSolidCube(1);
-    glPopMatrix();
 
-    glTranslatef(0, 0, 1);
+    glTranslatef(0.5, 0, 1);
     std::vector<VBar*> objects = *lines[curLine];
     std::vector<VBar*>::reverse_iterator it;
     std::vector<std::vector<VBar*>* >::iterator itt;
