@@ -1,3 +1,9 @@
+/*
+ * Audio.h - encapsulates all audio activities in the program
+ *
+ * David Harrigan
+ */
+
 #ifndef AUDIO_H_
 #define AUDIO_H_
 
@@ -15,7 +21,6 @@ FMOD::System *sys;
 
 // Global functions
 float *getSoundSpectrum(int);
-float *getSpectrum();
 
 class Audio {
 
