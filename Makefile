@@ -3,7 +3,7 @@
 # 
 
 PROG = visualizer
-MYCPPFLAGS = -std=c++11
+MYCPPFLAGS = -std=c++11 -m64
 
 # -------------------- set system-dependent variables ----------------
 CC          = gcc 
@@ -17,7 +17,8 @@ GL_LIBS     = -lglui -lglut -lGLU -lGL
 MAKEFILE    = Makefile
 X_INC       = -I/usr/X11/include
 XLIBS       = -L/usr/X11/lib 
-LIBS = $(XLIBS) $(GL_LIBS) -lfmodex 
+FMOD        = -O2 -m64 #-Lfmod/lib/libfmodex.so
+LIBS = $(XLIBS) $(GL_LIBS)
 #-lportaudio -lsndfile -ljack -lrt -lasound
 
 # -------------- Compiler and Linker flags ---------------
@@ -32,7 +33,7 @@ LDFLAGS     =
 
 #---------- Application info ------------------------------------------
 
-SRCS = $(wildcard *cpp)
+SRCS = $(wildcard *cpp) fmod/lib/libfmodex64.so
 
 # for every .cpp input, need to produce a .o
 OBJS = $(SRCS:.cpp=.o) 
@@ -41,7 +42,8 @@ OBJS = $(SRCS:.cpp=.o)
 # dependency: need1 need2 ...  
 #         action(s)
 #
-all:	build
+all:	build 
+    
 
 build: compile $(PROG)
 

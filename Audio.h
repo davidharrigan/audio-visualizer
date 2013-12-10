@@ -1,8 +1,8 @@
 #ifndef AUDIO_H_
 #define AUDIO_H_
 
-#include <fmodex/fmod.h>
-#include <fmodex/fmod_errors.h>
+#include "./fmod/inc/fmod.hpp"
+#include "./fmod/inc/fmod_errors.h"
 #include <string>
 
 #define SAMPLE_RATE 44100
@@ -10,8 +10,8 @@
 #define SPEED 1
 
 // Global static variables
-static FMOD_CHANNELGROUP *channelGroup;
-static FMOD_SYSTEM *sys;
+FMOD::ChannelGroup *channelGroup;
+FMOD::System *sys;
 
 // Global functions
 float *getSoundSpectrum(int);
@@ -35,8 +35,8 @@ public:
 
 
     FMOD_RESULT result;
-    FMOD_CHANNEL *channel;
-    FMOD_SOUND *sound;
+    FMOD::Channel *channel;
+    FMOD::Sound *sound;
     //FMOD_STREAM *stream;
 };
 

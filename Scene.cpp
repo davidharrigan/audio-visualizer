@@ -7,7 +7,6 @@
 
 #include "Scene.h"
 
-#include <fmodex/fmod.h>
 #include <iostream>
 #include <GL/glui.h>
 #include "Audio.h"

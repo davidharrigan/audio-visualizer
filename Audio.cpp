@@ -1,3 +1,4 @@
+
 #include "Audio.h"
 #include <string>
 #include <stdio.h>
@@ -27,7 +28,6 @@ int ofNextPow2(int x) {
 // Code borrowed from openFrameworks sounds library. 
 //
 float *getSoundSpectrum(int nBands){
-
 	// 	set to 0
 	for (int i = 0; i < 8192; i++){
 		fftInterpValues_[i] = 0;
@@ -46,9 +46,10 @@ float *getSoundSpectrum(int nBands){
 	if (nBandsToGet < 64) nBandsToGet = 64;  // can't seem to get fft of 32, etc from fmodex
 
 	// 	get the fft
-	FMOD_System_GetSpectrum(sys, fftSpectrum_, nBandsToGet, 0, FMOD_DSP_FFT_WINDOW_HANNING);
+	sys->getSpectrum(fftSpectrum_, nBandsToGet, 0, FMOD_DSP_FFT_WINDOW_HANNING);
 
 /*
+    //TRASH
     specLeft = new float[nBandsToGet];
     specRight = new float[nBandsToGet];
 	FMOD_System_GetSpectrum(sys, specLeft, nBandsToGet, 0, FMOD_DSP_FFT_WINDOW_HANNING);
@@ -60,7 +61,9 @@ float *getSoundSpectrum(int nBands){
 
     delete specLeft;
     delete specRight;
-*/
+    //ENDTRASH
+    */
+
 	// 	convert to db scale
 	for(int i = 0; i < nBandsToGet; i++){
         fftValues_[i] = 10.0f * (float)log10(1 + fftSpectrum_[i]) * 2.0f;
@@ -150,13 +153,14 @@ float* getSpectrum() {
     delete specLeft;
     delete specRight;
     */
-    FMOD_System_GetSpectrum(sys, fftInterpValues_, sampleSize, 0, FMOD_DSP_FFT_WINDOW_RECT);
+    //FMOD_System_GetSpectrum(sys, fftInterpValues_, sampleSize, 0, FMOD_DSP_FFT_WINDOW_RECT);
     return fftInterpValues_;
 }
 
 // Constructor
 //-------------------------------------------
 Audio::Audio() {
+    FMOD::DSP *dsp;
     pan = 0;
     volume = 1.0;
     sampleRate = 44100;
@@ -171,30 +175,31 @@ Audio::~Audio() {
 // Initialize FMOD system
 //
 void Audio::initialize() {
-    FMOD_System_Create(&sys);
-    FMOD_System_SetOutput(sys, FMOD_OUTPUTTYPE_ALSA);
-    FMOD_System_Init(sys, 32, FMOD_INIT_NORMAL, NULL);
-    FMOD_System_GetMasterChannelGroup(sys, &channelGroup);
+    result = System_Create(&sys);
+    //sys->setOutput(FMOD_OUTPUTTYPE_ALSA);
+    sys->init(32, FMOD_INIT_NORMAL, NULL);
+    sys->getMasterChannelGroup(&channelGroup);
 }
 
 //
 // Close FMOD system
 //
 void Audio::close() {
-    FMOD_System_Close(sys);
+    result = sys->close();
 }
 
 //
 // load audio file
 //
 bool Audio::loadFile(std::string fileName) {
-    result = FMOD_System_CreateSound(sys, fileName.c_str(), FMOD_SOFTWARE | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
+    result = sys->createSound( fileName.c_str(), FMOD_SOFTWARE | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
 
     if (result != FMOD_OK) {
         printf("Error loading %s\n", fileName.c_str());
+        printf("(%d) %s\n", result, FMOD_ErrorString(result));
         return false;
     }
-    FMOD_Sound_GetLength(sound, &length, FMOD_TIMEUNIT_PCM);
+    sound->getLength(&length, FMOD_TIMEUNIT_PCM);
     return true;
 }
 
@@ -202,13 +207,13 @@ bool Audio::loadFile(std::string fileName) {
 //
 //
 void Audio::play() {
-   FMOD_System_PlaySound(sys, FMOD_CHANNEL_FREE, sound, 0, &channel);
+   sys->playSound( FMOD_CHANNEL_FREE, sound, 0, &channel);
    //FMOD_Channel_GetFrequency(channel, &sampleRate);
-   FMOD_Channel_SetVolume(channel, 1);
-   FMOD_Channel_SetPan(channel, pan);
-   FMOD_Channel_SetFrequency(channel, sampleRate);
-   FMOD_Channel_SetMode(channel, FMOD_LOOP_OFF);
-   FMOD_System_Update(sys);
+   channel->setVolume(1);
+   channel->setPan(pan);
+   channel->setFrequency(sampleRate);
+   channel->setMode(FMOD_LOOP_OFF);
+   sys->update();
     
 }
 

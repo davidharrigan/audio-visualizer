@@ -4,7 +4,6 @@
 //
 
 #include <GL/glut.h>
-#include <portaudio.h>
 #include <stdio.h>
 #include "Audio.h"
 
