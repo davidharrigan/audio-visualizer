@@ -27,9 +27,11 @@ protected:
     std::vector<Box*> objects2;
     std::vector<Box*>::reverse_iterator it;
     
+    GLuint textureID;
     int sampleSize; 
     int steps; 
     int numBars;
     int curLine;
+
 };
 #endif /*SCENE_H_*/

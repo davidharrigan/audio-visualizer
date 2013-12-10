@@ -13,17 +13,45 @@
 #include "Audio.h"
 #include "Box.h"
 
-char noise[128][128][3];
 //GLubyte *noise;
-GLuint textureID;
+//char noise[512][512][3];
 GLUquadric* quadric;
 
-void generateNoise() {
-    for (int x=0; x<128; x++) {
-        for (int y=0; y<128; y++) {
-            noise[x][y][0] = (char)((rand() % 32768) / 32768.0);
-            noise[x][y][1] = (char)((rand() % 32768));
-            noise[x][y][2] = (char)((rand() % 32768) / 32768.0);
+//
+// 
+//
+void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
+    for (int y=0; y<1024; y++) {
+        for (int x=0; x<1024; x++) {
+            float freq = samples[x*y % 4096];
+            //noise[x][y][0] = freq[x*y%100] * 10000;
+            //noise[x][y][1] = freq[x*y%100] * 30000;
+            //noise[x][y][2] = freq[x*y%100] * 40000;
+            if (freq < 0.01) {
+                noise[x][y][0] = 0x00; // R
+                noise[x][y][1] = 0x00; // G
+                noise[x][y][2] = 0xff; // B
+            } 
+            else if (freq < 0.1) {
+                noise[x][y][0] = 0x60;
+                noise[x][y][1] = 0xff;
+                noise[x][y][2] = 0xf0;
+            }
+            else if (freq < 0.2) {
+                noise[x][y][0] = 0x99;
+                noise[x][y][1] = 0x0f;
+                noise[x][y][2] = 0xaa;
+            } 
+            else if (freq < 0.6) {
+                noise[x][y][0] = 0xff;
+                noise[x][y][1] = 0xef;
+                noise[x][y][2] = 0xff;
+            }
+            else {
+                noise[x][y][0] = 0xff;
+                noise[x][y][1] = 0xff;
+                noise[x][y][2] = 0xff;
+            }
         }
     }
 }
@@ -52,16 +80,10 @@ Scene::Scene() {
         b->setLocation(1-i*size, 0, 0);
         objects2.push_back(b);
     }
-
-    quadric = gluNewQuadric();
-    generateNoise();
     textureID = 0;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, 128, 128, 0, GL_BGR, GL_UNSIGNED_BYTE, noise);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    gluQuadricTexture(quadric, GLU_TRUE);
+
 }
 
 
@@ -88,6 +110,7 @@ void Scene::redraw() {
         (*it)->redraw(freq);
     }
     ampAvg /= i;
+
     glTranslatef(0,-0.005,0);
     glRotatef(90,1,0,0);
    
@@ -101,17 +124,29 @@ void Scene::redraw() {
     }
     glPopMatrix();
 
+    //glDeleteTextures(1, &textureID);
+    GLubyte noise[1024][1024][3];
+    generateNoise(samples, noise);
+    //glRasterPos3i(0.5, 0.5, 0.3);
+    //glDrawPixels(512,512,GL_RGB, GL_UNSIGNED_BYTE, noise);
+
     glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE,noise);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glPushMatrix();
         glBegin(GL_QUADS);
             glVertex3f(-1,-1,0);
-            glTexCoord3f(-1,-1,0);
+            glTexCoord2i(-1,-1);
             glVertex3f(-1,1,0);
-            glTexCoord3f(-1,1,0);
+            glTexCoord2i(-1,1);
             glVertex3f(1,1,0);
-            glTexCoord3f(1,1,0);
+            glTexCoord2i(1,1);
             glVertex3f(1,-1,0);
-            glTexCoord3f(1,-1,0);
+            glTexCoord2i(1,-1);
         glEnd();
     glPopMatrix();
     glDisable(GL_TEXTURE_2D);

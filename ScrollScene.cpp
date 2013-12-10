@@ -22,9 +22,9 @@ ScrollScene::ScrollScene() {
     curLine = 0;
     sampleSize = 1600; //2028, 4096, and 8192 are good
     steps = 6;
-    numBars = 33;
-    float size = 2.0 / (numBars*10);
-    for (int i=0; i<numBars*3; i++) {
+    numBars = 36;
+    float size = 2.0 / (numBars*6);
+    for (int i=0; i<numBars*2; i++) {
         std::vector<VBar*>* temp = new std::vector<VBar*>();
         for (int j=0; j<numBars; j++) {
             VBar *b = new VBar();

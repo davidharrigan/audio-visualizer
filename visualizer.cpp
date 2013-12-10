@@ -16,20 +16,21 @@
 #include <math.h>
 #include <unistd.h>
 
+bool scroll;
 int windowWidth  = 1280;
 int windowHeight = 960;
-//extern Packet *sharedBuffer;
-//PaStream* stream;
-ScrollScene *scene;
+Scene *scene;
 ScrollScene *scrollScene;
 Audio *audio;
+float lightX, lightY = 0.0;
+float sceneX, sceneY = 0.0;
 
 //
 // Create a scene
 //
 void createScene(void) {
-    scene = new ScrollScene();
-     //scene = new Scene(); 
+    scrollScene = new ScrollScene();
+    scene = new Scene(); 
 }
 
 //
@@ -69,7 +70,7 @@ void redraw(void) {
     GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
     GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat specular[4] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat location[4] = {-2.0, 1.5, -1.0, 1.0};
+    GLfloat location[4] = {lightX, lightY, 2, 1.0};
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
     glLightfv(GL_LIGHT1, GL_POSITION, location);
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
@@ -78,17 +79,57 @@ void redraw(void) {
     glEnable(GL_LIGHT1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(3,5,16,
+    gluLookAt(sceneX,sceneY,16,
               0,0,0,
               0,1,0);
-    scene->redraw();
+    if (scroll)
+        scrollScene->redraw();
+    else
+        scene->redraw();
     glutSwapBuffers();
     glFlush();
 }
 
+//
+// OpenGL keyboard function
+//
+void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+        case 's':
+            scroll ^= 1;
+            break;
+        case 'h':
+            sceneX -= 0.2;
+            break;
+        case 'l':
+            sceneX += 0.2;
+            break;
+        case 'j':
+            sceneY += 0.2;
+            break;
+        case 'k':
+            sceneY -= 0.2;
+            break;
+        case 'H':
+            lightX -= 0.2;
+            break;
+        case 'L':
+            lightX += 0.2;
+            break;
+        case 'J':
+            lightY += 0.2;
+            break;
+        case 'K':
+            lightY -= 0.2;
+            break;
+    }
+    printf("Camera: %.2f, %.2f\n", sceneX, sceneY);
+    printf("Light: %.2f, %.2f\n\n", lightX, lightY);
+    glutPostRedisplay();
+}
+
 int main(int argc, char *argv[]) {
-    int window;
-    //sharedBuffer = (Packet*)malloc(sizeof(Packet) * BUFFER_SIZE);
+    scroll = false;
 
     if (argc != 2) {
         printf("No sound file\n");
@@ -100,7 +141,7 @@ int main(int argc, char *argv[]) {
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(windowWidth, windowHeight);
     glutInitWindowPosition(100, 150);
-    window = glutCreateWindow("Visualizer");
+    glutCreateWindow("Visualizer");
 
     //Initialize audio components 
     audio = new Audio();
@@ -110,6 +151,7 @@ int main(int argc, char *argv[]) {
     }
     
     glutDisplayFunc(redraw);
+    glutKeyboardFunc(keyboard);
     appInit();
 
     audio->play();

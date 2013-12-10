@@ -1,6 +1,7 @@
 #include "VBar.h"
 #include <math.h>
 
+
 // Constructor
 //----------------------------------------------------
 VBar::VBar() {
@@ -9,6 +10,7 @@ VBar::VBar() {
     opacity = 0.8;
     color = new Color(0,0,0);
     childCount = 0;
+
 }
 
 
@@ -106,9 +108,20 @@ void VBar::redraw() {
     if (ySize > 0) {
         glPushMatrix();
             glColor3f(color->r, color->g, color->b);
-            glTranslatef(xLoc, yLoc + (ySize/2), zLoc);
+            glTranslatef(xLoc, yLoc + (ySize/8), zLoc);
             glScalef(xSize, ySize, zSize);
             //glutSolidDodecahedron();
+            //
+        glEnableClientState(GL_VERTEX_ARRAY);
+        GLfloat data[] = { 
+            0.0f, 1.0f, 0.0f,
+            -1.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, -1.0f,
+            0.0f, 1.0f, 1.0f };
+        glVertexPointer(3, GL_FLOAT, 0, data);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+        glDisableClientState(GL_VERTEX_ARRAY);
+
         glPopMatrix();
     }
  /* 
@@ -122,7 +135,7 @@ void VBar::createChildren(int maxChildren) {
     for (int i=1; i<maxChildren+1; i++) {
         VBar *v = new VBar();
         v->setLocation(xLoc, yLoc, zLoc);
-        v->setSize(xSize+(xSize*(i+1)*1.5), ySize, zSize*(i+1)*1.5);
+        v->setSize(xSize+(xSize*(i+1)*1.8), ySize, zSize*(i+1)*1.8);
         children.push_back(v);
     }
 }
