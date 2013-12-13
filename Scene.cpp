@@ -55,6 +55,7 @@ void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
     }
 }
 
+
 // Constructors
 // ------------------------------------------------------------------
 

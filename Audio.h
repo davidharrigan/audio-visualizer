@@ -15,9 +15,6 @@
 #define VOLUME 1
 #define SPEED 1
 
-// Global static variables
-FMOD::ChannelGroup *channelGroup;
-FMOD::System *sys;
 
 // Global functions
 float *getSoundSpectrum(int);

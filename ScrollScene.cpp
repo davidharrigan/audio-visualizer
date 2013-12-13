@@ -12,16 +12,16 @@
 #include "Audio.h"
 #include "VBar.h"
 
-//Packet *sharedBuffer;
-
 // Constructors
 // ------------------------------------------------------------------
 
 ScrollScene::ScrollScene() {
     curLine = 0;
-    sampleSize = 1600; //2028, 4096, and 8192 are good
+    //sampleSize = 1600; //2028, 4096, and 8192 are good
+    //steps = 6;
+    sampleSize = 2086;
     steps = 6;
-    numBars = 36;
+    numBars = 32;
     float size = 2.0 / (numBars*6);
     for (int i=0; i<numBars*2; i++) {
         std::vector<VBar*>* temp = new std::vector<VBar*>();
@@ -52,14 +52,14 @@ void ScrollScene::redraw() {
     std::vector<VBar*> objects = *lines[curLine];
     std::vector<VBar*>::reverse_iterator it;
     std::vector<std::vector<VBar*>* >::iterator itt;
-    int i;
+    unsigned int i;
     float ampAvg = 0;
     float* samples = getSoundSpectrum(sampleSize);
     //float* samples = getSpectrum();
 
     // move up all lines
     for (i=0, itt=lines.begin(); itt != lines.end(); itt++, i++) {
-        for (it=(*itt)->rbegin(); i==curLine, it!=(*itt)->rend(); it++) {
+        for (it=(*itt)->rbegin(); it!=(*itt)->rend(); it++) {
             (*it)->moveUp();
             (*it)->redraw();
         }

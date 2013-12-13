@@ -15,6 +15,10 @@ float fftValues_[8192];
 float fftInterpValues_[8192];	
 float fftSpectrum_[8192];
 
+// Global static variables
+FMOD::ChannelGroup *channelGroup;
+FMOD::System *sys;
+
 // Global functions
 //----------------------------------------------------------- 
 
@@ -104,7 +108,6 @@ float *getSoundSpectrum(int nBands){
 // Constructor
 //-------------------------------------------
 Audio::Audio() {
-    FMOD::DSP *dsp;
     pan = 0;
     volume = 1.0;
     sampleRate = 44100;

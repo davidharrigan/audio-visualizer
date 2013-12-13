@@ -28,6 +28,6 @@ protected:
     int sampleSize; 
     int steps; 
     int numBars;
-    int curLine;
+    unsigned int curLine;
 };
 #endif /*SCENE_H_*/

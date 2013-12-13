@@ -37,8 +37,8 @@ void VBar::setSize(float xs, float ys, float zs) {
 
 void VBar::setHeight(float freq) {
     int tempCount = 0;
-    ySize = freq;
-    if (ySize > 1) ySize = 1; //limit the max height
+    if (freq > 1) freq = 1; //limit the max height
+    else ySize = freq;
 
     // decide color
     if (freq < 0.05) {
@@ -55,17 +55,17 @@ void VBar::setHeight(float freq) {
         color->set(0.4 * freq * 1.2, 
                    1.0 * freq * 2, 
                    1.0);
-        tempCount = 8;
+        tempCount = 5;
     }
     else if(freq < 0.6) {
         color->set(0.4 * freq * 1.2, 
                    1.0 * freq * 2, 
                    1.0);
-        tempCount = 12;
+        tempCount = 6;
     }
     else {
         color->set(0.7 * freq, 0.4 * freq, 0.2);
-        tempCount = 16;
+        tempCount = 8;
     }
 
     if (children.size() > 0 && freq > 0.05) {
@@ -74,12 +74,11 @@ void VBar::setHeight(float freq) {
     } else {
         childCount = 0;
     }
-
     int i;
     //float offset = 0.01 * freq;
     float offset = 0.02;
     for (i=1, iter = children.begin(); i < childCount+1; iter++, i++)
-       (*iter)->setHeight(freq-offset*i);
+       (*iter)->setHeight(freq-offset*i*2);
 }
 
 void VBar::moveUp() {
@@ -108,21 +107,36 @@ void VBar::redraw() {
     if (ySize > 0) {
         glPushMatrix();
             glColor3f(color->r, color->g, color->b);
-            glTranslatef(xLoc, yLoc + (ySize/8), zLoc);
+            glTranslatef(xLoc, yLoc + (ySize/2), zLoc);
             glScalef(xSize, ySize, zSize);
             //glutSolidDodecahedron();
-            //
-        glEnableClientState(GL_VERTEX_ARRAY);
+            glutSolidCube(1);
+        /*
         GLfloat data[] = { 
             0.0f, 1.0f, 0.0f,
-            -1.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, -1.0f,
-            0.0f, 1.0f, 1.0f };
-        glVertexPointer(3, GL_FLOAT, 0, data);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+            0.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f
+        };
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 8, data);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 11);
+        glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-
+        */
         glPopMatrix();
+        int i;
+        for (i=0, iter = children.begin(); i<childCount; i++, iter++) 
+            (*iter)->redraw();
+
     }
  /* 
     int i;
@@ -133,9 +147,9 @@ void VBar::redraw() {
 
 void VBar::createChildren(int maxChildren) {
     for (int i=1; i<maxChildren+1; i++) {
-        VBar *v = new VBar();
+        VBar* v = new VBar();
         v->setLocation(xLoc, yLoc, zLoc);
-        v->setSize(xSize+(xSize*(i+1)*1.8), ySize, zSize*(i+1)*1.8);
+        v->setSize(xSize+(xSize*(1+i)*1.5), ySize, zSize);
         children.push_back(v);
     }
 }

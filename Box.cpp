@@ -53,13 +53,6 @@ void Box::redraw(float freq) {
         glTranslatef( xLoc, yLoc+(ySize/2), zLoc );
         glRotatef( angle, dxRot, dyRot, dzRot );
         glScalef( xSize, ySize, zSize );
-        
-        //glEnableClientState(GL_VERTEX_ARRAY);
-
-        //glVertexPointer(3, GL_FLOAT, 0, vertices);
-        //glDrawArrays(GL_QUADS, 0, 72);
-        
-        //glDisableClientState(GL_VERTEX_ARRAY);
         glutSolidCube(length);
     glPopMatrix();
 }

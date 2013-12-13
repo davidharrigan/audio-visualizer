@@ -4,6 +4,7 @@
 #include <vector>
 #include <GL/glut.h>
 #include "Color.h"
+#include "VBar.h"
 
 class VBar {
 
@@ -28,6 +29,7 @@ private:
 
     float xLoc, yLoc, zLoc;
     float xSize, ySize, zSize;
+    float height;
     Color *color;
     float opacity;
 
