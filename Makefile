@@ -6,18 +6,30 @@ PROG = visualizer
 MYCPPFLAGS = -std=c++11 -m64
 
 # -------------------- set system-dependent variables ----------------
-CC          = gcc 
-CCC         = g++
-LINKER      = g++
-GL_INC      = -I/usr/X11/include/GL
-GL_LIBS     = -lglui -lglut -lGLU -lGL 
+OS := $(shell uname)
+
+ifeq ($(OS), Darwin)
+    CC = clang
+    CCC = clang++
+    LINKER = clang++
+    GL_INC      = -I/Library/Frameworks/GLUI.framework/Headers \
+                  -I/System/Library/Frameworks/GLUT.framework/Headers \
+                  -I/System/Library/Frameworks/OpenGL.framework/Headers 
+    GL_LIBS     = -framework OpenGL -framework GLUT -framework GLUI
+else
+    CC          = gcc 
+    CCC         = g++
+    LINKER      = g++
+    GL_INC      = -I/usr/X11/include/GL
+    GL_LIBS     = -lglui -lglut -lGLU -lGL 
+    FMOD        = fmod/lib/libfmodex64.so
+endif
 
 # -------------- Common specifications ---------------------------------
 
 MAKEFILE    = Makefile
 X_INC       = -I/usr/X11/include
 XLIBS       = -L/usr/X11/lib 
-FMOD        = -O2 -m64 #-Lfmod/lib/libfmodex.so
 LIBS = $(XLIBS) $(GL_LIBS)
 #-lportaudio -lsndfile -ljack -lrt -lasound
 
@@ -33,7 +45,7 @@ LDFLAGS     =
 
 #---------- Application info ------------------------------------------
 
-SRCS = $(wildcard *cpp) fmod/lib/libfmodex64.so
+SRCS = $(wildcard *cpp) $(FMOD)
 
 # for every .cpp input, need to produce a .o
 OBJS = $(SRCS:.cpp=.o) 
