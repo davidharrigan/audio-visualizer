@@ -24,7 +24,7 @@ ScrollScene::ScrollScene() {
         for (int j=0; j<numBars; j++) {
             VBar *b = new VBar();
             b->setSize(size, 0, size*4);
-            b->setLocation(1-j*size*5, 0, 1-i*size + 2);
+            b->setLocation(1-j*size*5, 0, 1-i*size + 8);
             temp->push_back(b); 
             b->createChildren(10);
         }
@@ -65,7 +65,13 @@ void ScrollScene::redraw() {
    
     // redraw samples for current line
     for (i=0, it = objects.rbegin(); it != objects.rend(); i++, it++) {
-        float freq = samples[i];
+    float freq = samples[i];
+    if (i > 4 && (samples[i-3] > 0.7 || samples[i-2] > 0.6 || samples[i-1] > 0.4)) {
+        freq = 0;
+    }
+    if (i < 20 && (samples[i+3] > 0.7 || samples[i+2] > 0.6 || samples[i+1] > 0.4)) {
+        freq = 0;
+    }
         (*it)->setHeight(freq);
         (*it)->reset();
         (*it)->redraw();

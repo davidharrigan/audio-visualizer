@@ -68,7 +68,7 @@ void VBar::setHeight(float freq) {
     }
 
     if (children.size() > 0 && freq > 0.01) {
-        childCount = (freq * 5);
+        childCount = (freq * 8);
     } else {
         childCount = 0;
     }

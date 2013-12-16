@@ -22,19 +22,19 @@ void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
         freq += samples[y+3];
         for (int x=0; x<1024; x++) {
             if (freq < 0.001) {
-                noise[x][y][0] = 0x22; // R
-                noise[x][y][1] = 0x22; // G
-                noise[x][y][2] = 0xff; // B
+                noise[x][y][0] = 0x00; // R
+                noise[x][y][1] = 0x00; // G
+                noise[x][y][2] = 0x00; // B
             } 
             else if (freq < 0.01) {
-                noise[x][y][0] = 0xee;
-                noise[x][y][1] = 0xaa;
-                noise[x][y][2] = 0x22;
+                noise[x][y][0] = 0xc0;
+                noise[x][y][1] = 0xc0;
+                noise[x][y][2] = 0xfe;
             }
             else if (freq < 0.02) {
-                noise[x][y][0] = 0xff;
-                noise[x][y][1] = 0x0f;
-                noise[x][y][2] = 0xaa;
+                noise[x][y][0] = 0x6b;
+                noise[x][y][1] = 0xd9;
+                noise[x][y][2] = 0xfe;
             } 
             else if (freq < 0.04) {
                 noise[x][y][0] = 0xff;
@@ -43,13 +43,13 @@ void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
             }
             else if (freq < 0.08) {
                 noise[x][y][0] = 0x00;
-                noise[x][y][1] = 0xff;
-                noise[x][y][2] = 0xff;
+                noise[x][y][1] = 0xbb;
+                noise[x][y][2] = 0xaa;
             }
             else if (freq < 0.14) {
                 noise[x][y][0] = 0x22;
                 noise[x][y][1] = 0x00;
-                noise[x][y][2] = 0xff;
+                noise[x][y][2] = 0xee;
             }
             else {
                 noise[x][y][0] = 0xaa;

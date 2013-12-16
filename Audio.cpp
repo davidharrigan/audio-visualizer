@@ -175,6 +175,11 @@ void Audio::initialize() {
     sys->createDSPByType(FMOD_DSP_TYPE_PARAMEQ, &parameq);
     sys->addDSP(parameq, 0);
     parameq->setParameter(FMOD_DSP_PARAMEQ_CENTER, 12000.0f);
+
+    FMOD::DSP *distortion = 0;
+    sys->createDSPByType(FMOD_DSP_TYPE_DISTORTION, &distortion);
+    sys->addDSP(distortion, 0);
+    distortion->setParameter(FMOD_DSP_DISTORTION_LEVEL, 0.2f);
 }
 
 //
@@ -213,7 +218,7 @@ bool Audio::loadFile() {
 void Audio::play() {
    sys->playSound( FMOD_CHANNEL_FREE, sound, 0, &channel);
    //FMOD_Channel_GetFrequency(channel, &sampleRate);
-   channel->setVolume(1);
+   channel->setVolume(volume);
    channel->setPan(pan);
    channel->setFrequency(sampleRate);
    channel->setMode(FMOD_LOOP_OFF);

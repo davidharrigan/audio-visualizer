@@ -16,10 +16,11 @@
 #include <unistd.h>
 
 bool scroll;
-int windowWidth  = 1280;
-int windowHeight = 960;
+int windowWidth  = 1920;
+int windowHeight = 1080;
 float lightX, lightY = 0.0;
-float sceneX, sceneY = 0.0;
+float sceneX = 3.4;
+float sceneY = 5.4;
 
 Scene *scene;
 ScrollScene *scrollScene;
@@ -69,7 +70,7 @@ void redraw(void) {
     GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
     GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat specular[4] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat location[4] = {lightX, lightY, 2, 1.0};
+    GLfloat location[4] = {0.2, 1.4, -1, 1.0};
     glLightfv(GL_LIGHT1, GL_POSITION, location);
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
@@ -78,9 +79,9 @@ void redraw(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(sceneX,sceneY,16,
-              0,0,0,
+              0.5,0,0,
               0,1,0);
-    if (scroll)
+    if (!scroll)
         scrollScene->redraw();
     else
         scene->redraw();
