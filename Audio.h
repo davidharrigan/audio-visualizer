@@ -10,14 +10,15 @@
 #include "./fmod/inc/fmod.hpp"
 #include "./fmod/inc/fmod_errors.h"
 #include <string>
+#include <vector>
 
-#define SAMPLE_RATE 44100
+#define SAMPLE_RATE 48000;
 #define VOLUME 1
 #define SPEED 1
 
-
 // Global functions
 float *getSoundSpectrum(int);
+void getSoundSpectrum(int, float*);
 
 class Audio {
 
@@ -27,19 +28,23 @@ public:
     void initialize();
     void close();
 
-    bool loadFile(std::string fileName);
+    bool loadFile();
+    void saveFile(std::string fileName);
     void play();
+    void stop();
+    void next();
     
+    unsigned int curFile;
     float pan;
     float sampleRate;
     float volume;
     unsigned int length;
 
+    std::vector<std::string> files;
 
     FMOD_RESULT result;
     FMOD::Channel *channel;
     FMOD::Sound *sound;
-    //FMOD_STREAM *stream;
 };
 
 #endif
