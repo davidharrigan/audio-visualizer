@@ -8,7 +8,6 @@
 #include "Scene.h"
 
 #include <iostream>
-#include <GL/glui.h>
 #include "Audio.h"
 #include "Box.h"
 

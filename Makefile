@@ -1,9 +1,10 @@
 #
 # David Harrigan
 # 
+# install_name_tool -change ./libfmodex.dylib fmod/lib/fmodex.dylib visualizer
 
 PROG = visualizer
-MYCPPFLAGS = -std=c++11 -m64
+#MYCPPFLAGS = -std=c++11 -m64
 
 # -------------------- set system-dependent variables ----------------
 OS := $(shell uname)
@@ -15,7 +16,8 @@ ifeq ($(OS), Darwin)
     GL_INC      = -I/Library/Frameworks/GLUI.framework/Headers \
                   -I/System/Library/Frameworks/GLUT.framework/Headers \
                   -I/System/Library/Frameworks/OpenGL.framework/Headers 
-    GL_LIBS     = -framework OpenGL -framework GLUT -framework GLUI
+    GL_LIBS     = -framework OpenGL -framework GLUT
+    FMOD        = fmod/lib/libfmodex.dylib
 else
     CC          = gcc 
     CCC         = g++
