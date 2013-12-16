@@ -12,43 +12,49 @@
 #include "Audio.h"
 #include "Box.h"
 
-//GLubyte *noise;
-//char noise[512][512][3];
-GLUquadric* quadric;
-
 //
-// 
+// Generate texture for the background
 //
 void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
     for (int y=0; y<1024; y++) {
+        float freq = samples[y];
+        freq += samples[y+1];
+        freq += samples[y+2];
+        freq += samples[y+3];
         for (int x=0; x<1024; x++) {
-            float freq = samples[x*y % 4096];
-            //noise[x][y][0] = freq[x*y%100] * 10000;
-            //noise[x][y][1] = freq[x*y%100] * 30000;
-            //noise[x][y][2] = freq[x*y%100] * 40000;
-            if (freq < 0.01) {
-                noise[x][y][0] = 0x00; // R
-                noise[x][y][1] = 0x00; // G
+            if (freq < 0.001) {
+                noise[x][y][0] = 0x22; // R
+                noise[x][y][1] = 0x22; // G
                 noise[x][y][2] = 0xff; // B
             } 
-            else if (freq < 0.1) {
-                noise[x][y][0] = 0x60;
-                noise[x][y][1] = 0xff;
-                noise[x][y][2] = 0xf0;
+            else if (freq < 0.01) {
+                noise[x][y][0] = 0xee;
+                noise[x][y][1] = 0xaa;
+                noise[x][y][2] = 0x22;
             }
-            else if (freq < 0.2) {
-                noise[x][y][0] = 0x99;
+            else if (freq < 0.02) {
+                noise[x][y][0] = 0xff;
                 noise[x][y][1] = 0x0f;
                 noise[x][y][2] = 0xaa;
             } 
-            else if (freq < 0.6) {
+            else if (freq < 0.04) {
                 noise[x][y][0] = 0xff;
-                noise[x][y][1] = 0xef;
+                noise[x][y][1] = 0x22;
+                noise[x][y][2] = 0x22;
+            }
+            else if (freq < 0.08) {
+                noise[x][y][0] = 0x00;
+                noise[x][y][1] = 0xff;
+                noise[x][y][2] = 0xff;
+            }
+            else if (freq < 0.14) {
+                noise[x][y][0] = 0x22;
+                noise[x][y][1] = 0x00;
                 noise[x][y][2] = 0xff;
             }
             else {
-                noise[x][y][0] = 0xff;
-                noise[x][y][1] = 0xff;
+                noise[x][y][0] = 0xaa;
+                noise[x][y][1] = 0x00;
                 noise[x][y][2] = 0xff;
             }
         }
@@ -56,7 +62,7 @@ void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
 }
 
 
-// Constructors
+// Constructor
 // ------------------------------------------------------------------
 
 Scene::Scene() {
@@ -124,11 +130,8 @@ void Scene::redraw() {
     }
     glPopMatrix();
 
-    //glDeleteTextures(1, &textureID);
     GLubyte noise[1024][1024][3];
     generateNoise(samples, noise);
-    //glRasterPos3i(0.5, 0.5, 0.3);
-    //glDrawPixels(512,512,GL_RGB, GL_UNSIGNED_BYTE, noise);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -141,15 +144,13 @@ void Scene::redraw() {
         glBegin(GL_QUADS);
             glVertex3f(-1,-1,0);
             glTexCoord2i(-1,-1);
-            glVertex3f(-1,1,0);
+            glVertex3f(-1,1,-1);
             glTexCoord2i(-1,1);
-            glVertex3f(1,1,0);
+            glVertex3f(1,1,-1);
             glTexCoord2i(1,1);
             glVertex3f(1,-1,0);
             glTexCoord2i(1,-1);
         glEnd();
     glPopMatrix();
     glDisable(GL_TEXTURE_2D);
-
-    //glClearColor(0,0, ampAvg*0.2, 1.0);
 }

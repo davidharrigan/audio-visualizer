@@ -73,7 +73,7 @@ $(PROG): $(OBJS) $(COBJS)
 	$(LINKER) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
 
 run:
-	./$(PROG)
+	./$(PROG) title-theme.mp3 transmission.mp3 kokiri-forest.mp3
 
 clean:
 	rm -f *.o $(PROG)

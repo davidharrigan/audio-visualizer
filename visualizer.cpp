@@ -18,11 +18,12 @@
 bool scroll;
 int windowWidth  = 1280;
 int windowHeight = 960;
+float lightX, lightY = 0.0;
+float sceneX, sceneY = 0.0;
+
 Scene *scene;
 ScrollScene *scrollScene;
 Audio *audio;
-float lightX, lightY = 0.0;
-float sceneX, sceneY = 0.0;
 
 //
 // Create a scene
@@ -64,13 +65,11 @@ void appInit(void) {
 //
 void redraw(void) {
     glutPostRedisplay();
-    //glutTimerFunc(30, redraw, -1);    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
     GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat specular[4] = {1.0, 1.0, 1.0, 1.0};
     GLfloat location[4] = {lightX, lightY, 2, 1.0};
-    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
     glLightfv(GL_LIGHT1, GL_POSITION, location);
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
@@ -85,8 +84,8 @@ void redraw(void) {
         scrollScene->redraw();
     else
         scene->redraw();
-    glutSwapBuffers();
     glFlush();
+    glutSwapBuffers();
 }
 
 //
@@ -121,6 +120,12 @@ void keyboard(unsigned char key, int x, int y) {
         case 'K':
             lightY -= 0.2;
             break;
+        case 'n':
+            audio->next();
+            break;
+        case 27:
+            exit(0);
+
     }
     printf("Camera: %.2f, %.2f\n", sceneX, sceneY);
     printf("Light: %.2f, %.2f\n\n", lightX, lightY);
@@ -130,7 +135,7 @@ void keyboard(unsigned char key, int x, int y) {
 int main(int argc, char *argv[]) {
     scroll = false;
 
-    if (argc != 2) {
+    if (argc < 2) {
         printf("No sound file\n");
         return EXIT_FAILURE;
     }
@@ -145,9 +150,10 @@ int main(int argc, char *argv[]) {
     //Initialize audio components 
     audio = new Audio();
     audio->initialize();
-    if (!audio->loadFile(argv[1])) {
-        return EXIT_FAILURE;
+    for (int i=1; i<argc; i++) {
+        audio->saveFile(argv[i]);
     }
+    audio->loadFile();
     
     glutDisplayFunc(redraw);
     glutKeyboardFunc(keyboard);
