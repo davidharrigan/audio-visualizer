@@ -128,7 +128,7 @@ void getSoundSpectrum(int range, float* output) {
     float* right = new float[8192];
     int curNote = 0;
     sys->getSpectrum(left, 8192, 0, FMOD_DSP_FFT_WINDOW_RECT);
-    sys->getSpectrum(right, 8192, 0, FMOD_DSP_FFT_WINDOW_RECT);
+    sys->getSpectrum(right, 8192, 1, FMOD_DSP_FFT_WINDOW_RECT);
 
     // average the left and right channels
     for (int i=0; i<8192; i++)
@@ -137,12 +137,9 @@ void getSoundSpectrum(int range, float* output) {
     for (int i=0; i<8192; i++) {
         if ((float)i > notefreq[curNote + 1] - notefreq[curNote +1] / 2) 
             curNote++;
-        if (fftInterpValues_[i] > 0.001 && fftInterpValues_[i] < 1.0f) {
-            if (output[curNote % range] != 0) {
-                output[curNote % range] += fftInterpValues_[i]; 
-            } else {
-                output[curNote % range] = fftInterpValues_[i];
-            }
+        if (fftInterpValues_[i] > 0.01 && fftInterpValues_[i] < 1.0f) {
+            //output[curNote % range] += (left[i] > right[i]) ? left[i] : right[i]; 
+            output[curNote % range] += fftInterpValues_[i];
         }
     }
     delete left;
@@ -173,6 +170,11 @@ void Audio::initialize() {
     //sys->setOutput(FMOD_OUTPUTTYPE_ALSA);
     sys->init(32, FMOD_INIT_NORMAL, NULL);
     sys->getMasterChannelGroup(&channelGroup);
+
+    FMOD::DSP *parameq = 0;
+    sys->createDSPByType(FMOD_DSP_TYPE_PARAMEQ, &parameq);
+    sys->addDSP(parameq, 0);
+    parameq->setParameter(FMOD_DSP_PARAMEQ_CENTER, 12000.0f);
 }
 
 //

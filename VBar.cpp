@@ -36,9 +36,9 @@ void VBar::setSize(float xs, float ys, float zs) {
 }
 
 void VBar::setHeight(float freq) {
+    float offset;
     if (freq > 0.8) freq = 0.8; //limit the max height
     else ySize = freq;
-    freq *= 0.96;
 
     // decide color
     if (freq < 0.01) {
@@ -46,31 +46,34 @@ void VBar::setHeight(float freq) {
         color->set(0, 0, 0);
         opacity = 0;
     }
-    else if(freq < 0.3) {
+    else if(freq < 0.2) {
         color->set(1.0 * freq * 4, 0.1, 1.0);
+        offset = 0.01;
     }
-    else if(freq < 0.5) {
+    else if(freq < 0.4) {
         color->set(0.4 * freq * 1.2, 
                    1.0 * freq * 2, 
                    1.0);
+        offset = 0.02;
     }
     else if(freq < 0.6) {
         color->set(0.4 * freq * 1.2, 
                    1.0 * freq * 2, 
                    1.0);
+        offset = 0.04;
     }
     else {
-        color->set(0.4 * freq , 0.9 * freq, 0.4);
+        color->set(0.4 * freq , 1.5 * freq, 0.4);
+        offset = 0.06;
     }
 
     if (children.size() > 0 && freq > 0.01) {
-        childCount = (freq * 6);
+        childCount = (freq * 5);
     } else {
         childCount = 0;
     }
     
     int i;
-    float offset = 0.02;
     for (i=1, iter = children.begin(); i < childCount+1; iter++, i++)
        (*iter)->setHeight(freq-offset*i*2);
 }

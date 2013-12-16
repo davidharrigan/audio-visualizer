@@ -24,7 +24,7 @@ ScrollScene::ScrollScene() {
         for (int j=0; j<numBars; j++) {
             VBar *b = new VBar();
             b->setSize(size, 0, size*4);
-            b->setLocation(1-j*size*6, 0, 1-i*size);
+            b->setLocation(1-j*size*5, 0, 1-i*size + 2);
             temp->push_back(b); 
             b->createChildren(10);
         }
