@@ -4,6 +4,8 @@
 //
 
 #include <GL/glut.h>
+#include <GL/glext.h>
+
 #include <stdio.h>
 #include "Audio.h"
 
@@ -14,10 +16,11 @@
 
 #include <math.h>
 #include <unistd.h>
+#include <iostream>
 
 bool scroll;
-int windowWidth  = 1920;
-int windowHeight = 1080;
+int windowWidth  = 1280;
+int windowHeight = 720;
 float lightX, lightY = 0.0;
 float sceneX = 3.4;
 float sceneY = 5.4;
@@ -147,6 +150,9 @@ int main(int argc, char *argv[]) {
     glutInitWindowSize(windowWidth, windowHeight);
     glutInitWindowPosition(100, 150);
     glutCreateWindow("Visualizer");
+
+    std::cerr << "OpenGL version: " << (char*)glGetString(GL_VERSION) << std::endl;
+    std::cerr << "Shader version: " << (char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     //Initialize audio components 
     audio = new Audio();
