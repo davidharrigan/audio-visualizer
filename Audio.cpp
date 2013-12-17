@@ -176,10 +176,12 @@ void Audio::initialize() {
     sys->addDSP(parameq, 0);
     parameq->setParameter(FMOD_DSP_PARAMEQ_CENTER, 12000.0f);
 
+    /*
     FMOD::DSP *distortion = 0;
     sys->createDSPByType(FMOD_DSP_TYPE_DISTORTION, &distortion);
     sys->addDSP(distortion, 0);
     distortion->setParameter(FMOD_DSP_DISTORTION_LEVEL, 0.2f);
+    */
 }
 
 //

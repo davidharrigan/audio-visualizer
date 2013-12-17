@@ -1,10 +1,11 @@
 #ifndef VBAR_H_
 #define VBAR_H_
+#define GL_GLEXT_PROTOTYPES
 
 #include <vector>
 #include <GL/glut.h>
+#include <GL/glext.h>
 #include "Color.h"
-#include "VBar.h"
 
 class VBar {
 
@@ -23,6 +24,9 @@ public:
     void reset();
     void redraw();
 
+    void buildBuffers();
+    void buildShaders();
+    void sendToShader();
     void createChildren(int);
   
 private:
@@ -32,10 +36,53 @@ private:
     float height;
     Color *color;
     float opacity;
+    GLuint id, vertexBuffer;
+    GLuint shaderProgram;
 
     std::vector<VBar*> children;  
     std::vector<VBar*>::iterator iter;
     int childCount;
+
+    GLfloat data[36*3] = {
+		-1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		 1.0f, 1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f,-1.0f,
+		 1.0f,-1.0f,-1.0f,
+		 1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f,-1.0f, 1.0f,
+		 1.0f,-1.0f, 1.0f,
+		 1.0f, 1.0f, 1.0f,
+		 1.0f,-1.0f,-1.0f,
+		 1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f,-1.0f,
+		 1.0f, 1.0f, 1.0f,
+		 1.0f,-1.0f, 1.0f,
+		 1.0f, 1.0f, 1.0f,
+		 1.0f, 1.0f,-1.0f,
+		-1.0f, 1.0f,-1.0f,
+		 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		 1.0f,-1.0f, 1.0f
+
+    };    
 };
+
 
 #endif
