@@ -2,6 +2,8 @@
 #include <math.h>
 #include "makeShader.h"
 
+extern int checkGLerror(const char*, bool quit=false);
+GLuint shaderProgram;
 
 // Constructor
 //----------------------------------------------------
@@ -10,7 +12,7 @@ VBar::VBar() {
     xSize = ySize = zSize = 0;
     childCount = 0;
     opacity = 0.8;
-    color = new Color(0,0,0);
+    color = vec4(1,0,0,0);
 
     buildShaders();
     buildBuffers();
@@ -24,13 +26,26 @@ VBar::~VBar() {
 
 // VAO
 //----------------------------------------------------
+
+//
+//
+//
 void VBar::buildBuffers() {
-    glGenVertexArrays(1, &id);
-    glBindVertexArray(id);
     
+    // Create Vertex array object
+    GLuint vPosId[1];
+    glGenVertexArrays(1, vPosId);
+    checkGLerror("GenVertexArrays");
+   
+    vertexArrayId = vPosId[0];
+    glBindVertexArray(vertexArrayId);
+    printf("binding %d\n", vertexArrayId);
+
     // Create buffer objects
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    GLuint buffer[1];
+    glGenBuffers(1, buffer);
+    bufferId = buffer[0];
+    glBindBuffer(GL_ARRAY_BUFFER, bufferId);
     glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
     // Initialize the vertex position attribute from the vertex shader
@@ -43,11 +58,17 @@ void VBar::buildBuffers() {
     glVertexAttribPointer(pmv, 2, GL_DOUBLE, GL_FALSE, 0, BUFFER_OFFSET(0));
 }
 
+//
+//
+//
 void VBar::buildShaders() {
     shaderProgram = makeShaderProgram("vertex.vsh", "color.fsh");
     glUseProgram(shaderProgram);
 }
 
+//
+//
+//
 void VBar::sendToShader() {
     GLfloat modelview[16];
     glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
@@ -83,40 +104,7 @@ void VBar::setHeight(float freq) {
     if (freq > 0.8) freq = 0.8; //limit the max height
     else ySize = freq;
 
-    // decide color
-    if (freq < 0.01) {
-        ySize = 0;
-        color->set(0, 0, 0);
-        opacity = 0;
-        offset = 0;
-    }
-    else if(freq < 0.2) {
-        color->set(1.0 * freq * 4, 0.1, 1.0);
-        offset = 0.01;
-    }
-    else if(freq < 0.4) {
-        color->set(0.4 * freq * 1.2, 
-                   1.0 * freq * 2, 
-                   1.0);
-        offset = 0.02;
-    }
-    else if(freq < 0.6) {
-        color->set(0.4 * freq * 1.2, 
-                   1.0 * freq * 2, 
-                   1.0);
-        offset = 0.04;
-    }
-    else {
-        color->set(0.4 * freq , 1.5 * freq, 0.4);
-        offset = 0.06;
-    }
-
-    if (children.size() > 0 && freq > 0.01) {
-        childCount = (freq * 8);
-    } else {
-        childCount = 0;
-    }
-    
+    //
     int i;
     for (i=1, iter = children.begin(); i < childCount+1; iter++, i++)
        (*iter)->setHeight(freq-offset*i*2);
@@ -148,11 +136,13 @@ void VBar::redraw() {
     printf("redraw\n");
         sendToShader();
     
-        //GLint colorLoc = glGetUniformLocation(shaderProgram, "color");
-        //glUniform4fv(colorLoc, 1, color);
-        glBindVertexArray(vertexBuffer);
+        GLint colorLoc = glGetUniformLocation(shaderProgram, "color");
+        glUniform4fv(colorLoc, 1, color);
+        
+        glBindVertexArray(vertexArrayId);
         glDrawArrays(GL_TRIANGLES, 0, 12*3);
         glBindVertexArray(0);
+
  /* 
     int i;
     for (i=0, iter = children.begin(); i < childCount; i++, iter++)

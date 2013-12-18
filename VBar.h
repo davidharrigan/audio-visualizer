@@ -1,11 +1,11 @@
 #ifndef VBAR_H_
 #define VBAR_H_
-#define GL_GLEXT_PROTOTYPES
 
 #include <vector>
-#include <GL/glut.h>
-#include <GL/glext.h>
-#include "Color.h"
+#include "opengl.h"
+
+#include "vec.h"
+#include "mat.h"
 
 class VBar {
 
@@ -34,10 +34,12 @@ private:
     float xLoc, yLoc, zLoc;
     float xSize, ySize, zSize;
     float height;
-    Color *color;
+    vec4  color;
     float opacity;
-    GLuint id, vertexBuffer;
-    GLuint shaderProgram;
+
+    GLuint vertexArrayId;
+    GLuint bufferId;
+    GLuint vPositionId;
 
     std::vector<VBar*> children;  
     std::vector<VBar*>::iterator iter;
