@@ -3,10 +3,8 @@
 //
 //
 
-#include <GL/glut.h>
-#include <GL/glext.h>
-
 #include <stdio.h>
+#include "opengl.h"
 #include "Audio.h"
 
 #include "Point3.h"
@@ -28,6 +26,8 @@ float sceneY = 5.4;
 Scene *scene;
 ScrollScene *scrollScene;
 Audio *audio;
+
+glm::mat4 MVP; 
 
 //
 // Create a scene
@@ -54,6 +54,7 @@ void appInit(void) {
     glClearColor(0,0,0,0.0);
     glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
@@ -61,6 +62,21 @@ void appInit(void) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glutReshapeFunc(reshape);
+
+
+    glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    glm::mat4 View = glm::lookAt( glm::vec3(4,3,-3), 
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(0,1,0));
+    glm::mat4 Model = glm::mat4(1.0f);
+    MVP = Projection * View * Model;
+    
+    if (glewInit() != GLEW_OK) {
+        exit(EXIT_FAILURE);
+    }
+    if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
+        printf("GLSL Supported\n");
+
     createScene();
 }
 
@@ -88,7 +104,6 @@ void redraw(void) {
         scrollScene->redraw();
     else
         scene->redraw();
-    glFlush();
     glutSwapBuffers();
 }
 

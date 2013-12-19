@@ -1,9 +1,101 @@
 #include "VBar.h"
 #include <math.h>
-#include "makeShader.h"
+#include <stdio.h>
+#include "shader.h"
 
 extern int checkGLerror(const char*, bool quit=false);
+extern glm::mat4 MVP;
 GLuint shaderProgram;
+
+GLfloat data[] = {
+    -1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,
+    -1.0f, 1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f
+
+};    
+
+GLfloat colors[] = {
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.585f, 0.771f, 0.014f, 
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.666f, 0.430f, 0.123f,
+    0.342f, 0.434f, 0.434f,
+    0.342f, 0.434f, 0.434f,
+};
 
 // Constructor
 //----------------------------------------------------
@@ -28,61 +120,32 @@ VBar::~VBar() {
 //----------------------------------------------------
 
 //
+// Initialize the vertex position attribute from the vertex shader
 //
 //
 void VBar::buildBuffers() {
     
-    // Create Vertex array object
-    GLuint vPosId[1];
-    glGenVertexArrays(1, vPosId);
-    checkGLerror("GenVertexArrays");
-   
-    vertexArrayId = vPosId[0];
-    glBindVertexArray(vertexArrayId);
-    printf("binding %d\n", vertexArrayId);
+    // Get a handle of the MVP uniform
+    matrixID = glGetAttribLocation(shaderProgram, "MVP");
+    
+    // Get a handle of the buffer
+    vPositionID = glGetAttribLocation(shaderProgram, "vPosition");
+    colorID = glGetAttribLocation(shaderProgram, "vertexColor");
 
-    // Create buffer objects
-    GLuint buffer[1];
-    glGenBuffers(1, buffer);
-    bufferId = buffer[0];
-    glBindBuffer(GL_ARRAY_BUFFER, bufferId);
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
-    // Initialize the vertex position attribute from the vertex shader
-    GLuint loc = glGetUniformLocation(shaderProgram, "vPosition");
-    glEnableVertexAttribArray(loc);
-    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    
-    GLuint pmv = glGetAttribLocation(shaderProgram, "projXmv");
-    glEnableVertexAttribArray(pmv);
-    glVertexAttribPointer(pmv, 2, GL_DOUBLE, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glGenBuffers(1, &colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 }
 
 //
 //
 //
 void VBar::buildShaders() {
-    shaderProgram = makeShaderProgram("vertex.vsh", "color.fsh");
-    glUseProgram(shaderProgram);
-}
-
-//
-//
-//
-void VBar::sendToShader() {
-    GLfloat modelview[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glMultMatrixf(modelview);
-
-    GLfloat PtimesMV[16];
-    glGetFloatv(GL_PROJECTION_MATRIX, PtimesMV);
-    glPopMatrix();
-
-    GLint matLoc = glGetUniformLocation(shaderProgram, "projXmv");
-    glUniformMatrix4fv(matLoc, 1, false, PtimesMV);
+    shaderProgram = loadShaders("vertex.vsh", "color.fsh");
 }
 
 // Public Methods
@@ -133,15 +196,26 @@ void VBar::reset() {
 }
 
 void VBar::redraw() {
-    printf("redraw\n");
-        sendToShader();
-    
-        GLint colorLoc = glGetUniformLocation(shaderProgram, "color");
-        glUniform4fv(colorLoc, 1, color);
-        
-        glBindVertexArray(vertexArrayId);
-        glDrawArrays(GL_TRIANGLES, 0, 12*3);
-        glBindVertexArray(0);
+    glUseProgram(shaderProgram);
+
+    // Send transformation to the currently bound shader 
+    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+
+    // Vertex
+    glEnableVertexAttribArray(vPositionID);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(vPositionID, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Color
+    glEnableVertexAttribArray(colorID);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glVertexAttribPointer(colorID, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 12*3);
+
+    glDisableVertexAttribArray(vPositionID);
+    glDisableVertexAttribArray(colorID);
+
 
  /* 
     int i;
@@ -152,10 +226,10 @@ void VBar::redraw() {
 
 void VBar::createChildren(int maxChildren) {
     return;
-    for (int i=1; i<maxChildren+1; i++) {
+    /*for (int i=1; i<maxChildren+1; i++) {
         VBar* v = new VBar();
         v->setLocation(xLoc, yLoc, zLoc);
         v->setSize(xSize+(xSize*(1+i)*1.5), ySize, zSize);
         children.push_back(v);
-    }
+    }*/
 }

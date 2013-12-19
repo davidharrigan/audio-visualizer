@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <string>
-#include <GL/glut.h>
+#include "opengl.h"
 #include "VBar.h"
 #include "Audio.h"
 
@@ -24,6 +24,7 @@ public:
 protected:
     //objects collection
     std::vector<std::vector<VBar*>*> lines;
+    VBar* v;
     
     int sampleSize; 
     int steps; 

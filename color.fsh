@@ -1,13 +1,8 @@
-#version 330 core
+#version 120
 
-// interpolated values from vertex shaders
-//in vec3 fragmentColor;
-
-// output
-//out vec3 color;
-uniform vec4 color
+uniform vec3 fragmentColor;
 
 void main() {
-    //color = fragmentColor;
-    gl_FragColor = color;
+    //gl_FragColor = color;
+    gl_FragColor = vec4(fragmentColor, 1);
 }
