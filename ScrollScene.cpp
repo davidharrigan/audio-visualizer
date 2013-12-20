@@ -15,10 +15,9 @@
 // ------------------------------------------------------------------
 
 ScrollScene::ScrollScene() {
-   /*
     curLine = 0;
     sampleSize = 2086;
-    numBars = 24;
+    numBars = 64;
     float size = 2.0 / (numBars*8);
     for (int i=0; i<numBars*2; i++) {
         std::vector<VBar*>* temp = new std::vector<VBar*>();
@@ -31,8 +30,6 @@ ScrollScene::ScrollScene() {
         }
         lines.push_back(temp);
     }
-    */
-
    v = new VBar(); 
 }
 
@@ -44,7 +41,6 @@ ScrollScene::ScrollScene() {
 // Redraws the scene
 //
 void ScrollScene::redraw() {
-    /*
     unsigned int i;
     float* samples = new float[24];
     if (curLine >= lines.size())
@@ -84,6 +80,5 @@ void ScrollScene::redraw() {
 
     curLine++;
     delete samples;
-    */
     v->redraw();
 }

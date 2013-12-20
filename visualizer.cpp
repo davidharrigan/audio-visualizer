@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include "opengl.h"
+#include "shader.h"
 #include "Audio.h"
 
 #include "Point3.h"
@@ -16,12 +17,16 @@
 #include <unistd.h>
 #include <iostream>
 
+using namespace glm;
+
 bool scroll;
 int windowWidth  = 1280;
 int windowHeight = 720;
 float lightX, lightY = 0.0;
 float sceneX = 3.4;
 float sceneY = 5.4;
+
+GLuint shaderProgram;
 
 Scene *scene;
 ScrollScene *scrollScene;
@@ -64,7 +69,7 @@ void appInit(void) {
     glutReshapeFunc(reshape);
 
 
-    glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    glm::mat4 Projection = glm::perspective(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
     glm::mat4 View = glm::lookAt( glm::vec3(4,3,-3), 
                                   glm::vec3(0,0,0),
                                   glm::vec3(0,1,0));
@@ -76,6 +81,9 @@ void appInit(void) {
     }
     if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
         printf("GLSL Supported\n");
+
+    shaderProgram = loadShaders("vertex.vsh", "color.fsh");
+    glUseProgram(shaderProgram);
 
     createScene();
 }
