@@ -137,6 +137,10 @@ void VBar::buildBuffers() {
     // Get a handle of the MVP uniform
     matrixID = glGetUniformLocation(shaderProgram, "MVP");
     moveID = glGetUniformLocation(shaderProgram, "move");
+
+    // Our input
+    vPositionID = glGetAttribLocation(shaderProgram, "vPosition");
+    colorID = glGetAttribLocation(shaderProgram, "vertexColor");
     
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -212,19 +216,19 @@ void VBar::redraw() {
     glUniform4fv(moveID, 1, move);
 
     // Vertex
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(vPositionID);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(vPositionID, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Color
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(colorID);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(colorID, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(vPositionID);
+    glDisableVertexAttribArray(colorID);
 
 
  /* 

@@ -4,9 +4,6 @@
 #include <vector>
 #include "opengl.h"
 
-#include "vec.h"
-#include "mat.h"
-
 class VBar {
 
 public:
@@ -33,13 +30,15 @@ private:
     float xLoc, yLoc, zLoc;
     float xSize, ySize, zSize;
     float height;
-    vec4  color;
+    glm::vec4  color;
     float opacity;
 
     GLuint vertexbuffer, colorbuffer;
     GLuint vPositionID;
     GLuint matrixID;
     GLuint colorID; 
+    GLuint vertexArrayID;
+    GLuint moveID;
 
     std::vector<VBar*> children;  
     std::vector<VBar*>::iterator iter;
