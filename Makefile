@@ -24,8 +24,7 @@ else
     LINKER      = g++
     GL_INC      = -I/usr/X11/include/GL
     GL_LIBS     = -lglui -lglut -lGLU -lGL -lm -lGLEW
-    FMOD        = -Ifmod/lib
-    FMOD_LIBS   = -lfmodex
+    FMOD        = fmod/lib/libfmodex64.so
 endif
 
 # -------------- Common specifications ---------------------------------
@@ -37,7 +36,7 @@ LIBS = $(XLIBS) $(GL_LIBS) $(FMOD_LIBS)
 #-lportaudio -lsndfile -ljack -lrt -lasound
 
 # -------------- Compiler and Linker flags ---------------
-CPPFLAGS    = -Wall $(MYCPPFLAGS) $(GL_INC) $(X_INC) $(FMOD)
+CPPFLAGS    = -Wall $(MYCPPFLAGS) $(GL_INC) $(X_INC) 
 
 #
 # If any linker flags are needed, they should be prefixed by "-Wl," 
@@ -48,7 +47,7 @@ LDFLAGS     =
 
 #---------- Application info ------------------------------------------
 
-SRCS = $(wildcard *cpp) 
+SRCS = $(wildcard *cpp) $(FMOD)
 
 # for every .cpp input, need to produce a .o
 OBJS = $(SRCS:.cpp=.o) 
