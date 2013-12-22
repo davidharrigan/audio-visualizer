@@ -9,7 +9,7 @@ extern int checkGLerror(const char*, bool quit=false);
 extern glm::mat4 MVP;
 extern GLuint shaderProgram;
 
-GLfloat data[] = {
+static GLfloat data[] = {
     -1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
@@ -46,19 +46,16 @@ GLfloat data[] = {
      1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
      1.0f,-1.0f, 1.0f
-
 };    
 
 // Constructor
 //----------------------------------------------------
 VBar::VBar() {
     childCount = 0;
-    opacity = 0.8;
     color = vec4(0,0,0,0);
     setLocation(0,0,0);
     setSize(0,0,0);
 
-    buildShaders();
     buildBuffers();
 }
 
@@ -68,12 +65,12 @@ VBar::VBar() {
 VBar::~VBar() {
 }
 
-// VAO
+
+// Public Methods
 //----------------------------------------------------
 
 //
-// Initialize the vertex position attribute from the vertex shader
-//
+// Fetches glsl uniform variables and initializes attribute buffer
 //
 void VBar::buildBuffers() {
   
@@ -94,14 +91,6 @@ void VBar::buildBuffers() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 }
 
-//
-//
-//
-void VBar::buildShaders() {
-}
-
-// Public Methods
-//----------------------------------------------------
 void VBar::setLocation(float x, float y, float z) {
     xLoc = x; 
     yLoc = y; 
@@ -119,30 +108,52 @@ void VBar::setSize(float xs, float ys, float zs) {
 }
 
 void VBar::setHeight(float freq) {
-    //ySize = freq;
-    
+    int i;
+    float offset;
+    freq = (freq > 0.8) ? 0.8 : freq;
     scaleMatrix[1][1] = freq;
     translationMatrix[3][1] += freq;
 
     if (freq < 0.01) 
         color = glm::vec4(0,0,0,0);
-    else if (freq < 0.2) 
+    else if (freq < 0.2) {
         color = glm::vec4(freq * 4.0f, 0.1f, 1.0f, 1.0f);
-    else if (freq < 0.4) 
+        offset = 0.01;
+    } else if (freq < 0.4) {
         color = glm::vec4(freq * 0.5f, freq * 2.0f, 1.0f, 1.0f);
-    else if (freq < 0.6)
+        offset = 0.02;
+    } else if (freq < 0.6) {
         color = glm::vec4(freq * 0.5f, freq * 2.0f, 0.8f, 1.0f);
-    else
+        offset = 0.04;
+    } else {
         color = glm::vec4(freq * 0.4f, freq * 1.5f, 0.4f, 1.0f);
+        offset = 0.06;
+    }
+
+    childCount = (children.size() > 0 && freq >= 0.01) ? (freq * 8) : 0;
+    for (i=1, iter=children.begin(); i<childCount+1; iter++, i++) 
+        (*iter)->setHeight(freq-offset*i*2);
 }
 
 void VBar::moveUp() {
     zLoc -= zSize;
     translationMatrix[3][2] = zLoc;
+
+    int i;
+    for (i=0, iter=children.begin(); i<childCount; i++, iter++)
+        (*iter)->moveUp(zSize);
+}
+
+void VBar::moveUp(float step) {
+    zLoc -= step;
+    translationMatrix[3][2] = zLoc;
 }
 
 void VBar::reset() {
     zLoc = 2; translationMatrix = glm::translate(xLoc, yLoc, zLoc);
+
+    for (iter=children.begin(); iter != children.end(); iter++)
+        (*iter)->reset();
 }
 
 void VBar::redraw() {
@@ -167,20 +178,16 @@ void VBar::redraw() {
 
     glDisableVertexAttribArray(vPositionID);
 
-
- /* 
     int i;
     for (i=0, iter = children.begin(); i < childCount; i++, iter++)
        (*iter)->redraw();
-       */
 }
 
 void VBar::createChildren(int maxChildren) {
-    return;
-    /*for (int i=1; i<maxChildren+1; i++) {
+    for (int i=1; i<maxChildren+1; i++) {
         VBar* v = new VBar();
-        v->setLocation(xLoc, yLoc, zLoc);
-        v->setSize(xSize+(xSize*(1+i)*1.5), ySize, zSize);
+        v->setLocation(xLoc, yLoc, zLoc+(i*0.005));
+        v->setSize(xSize+(xSize*(1+i)), ySize, zSize);
         children.push_back(v);
-    }*/
+    }
 }
