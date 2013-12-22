@@ -17,20 +17,18 @@
 ScrollScene::ScrollScene() {
     curLine = 0;
     sampleSize = 2086;
-    numBars = 64;
-    float size = 2.0 / (numBars*8);
-    for (int i=0; i<numBars*2; i++) {
+    numBars = 48;
+    float size = 2.0 / (numBars*3);
+    for (int i=0; i<numBars; i++) {
         std::vector<VBar*>* temp = new std::vector<VBar*>();
         for (int j=0; j<numBars; j++) {
             VBar *b = new VBar();
-            b->setSize(size, 0, size*4);
-            b->setLocation(1-j*size*5, 0, 1-i*size + 8);
+            b->setSize(size, 1, size*10);
+            b->setLocation(1-j*size*5, 0, 0);
             temp->push_back(b); 
-            b->createChildren(10);
         }
         lines.push_back(temp);
     }
-   v = new VBar(); 
 }
 
 
@@ -42,43 +40,34 @@ ScrollScene::ScrollScene() {
 //
 void ScrollScene::redraw() {
     unsigned int i;
-    float* samples = new float[24];
+    float* samples = new float[numBars];
     if (curLine >= lines.size())
         curLine = 0;
 
-    glTranslatef(0.5, 0, 1);
     std::vector<VBar*> objects = *lines[curLine];
     std::vector<VBar*>::reverse_iterator it;
-    std::vector<std::vector<VBar*>* >::iterator itt;
+    std::vector<std::vector<VBar*>*>::iterator itt;
 
     // get sound spectrum
-    for (i=0; i<24; i++) 
+    for (i=0; i<numBars; i++) 
         samples[i] = 0;
-    getSoundSpectrum(24, samples);
+    getSoundSpectrum(numBars, samples);
 
     // move up all lines
     for (i=0, itt=lines.begin(); itt != lines.end(); itt++, i++) {
-        for (it=(*itt)->rbegin(); it!=(*itt)->rend(); it++) {
+        for (it=(*itt)->rbegin(); it != (*itt)->rend(); it++) {
             (*it)->moveUp();
             (*it)->redraw();
         }
     }
-   
+
     // redraw samples for current line
     for (i=0, it = objects.rbegin(); it != objects.rend(); i++, it++) {
-    float freq = samples[i];
-    if (i > 4 && (samples[i-3] > 0.7 || samples[i-2] > 0.6 || samples[i-1] > 0.4)) {
-        freq = 0;
-    }
-    if (i < 20 && (samples[i+3] > 0.7 || samples[i+2] > 0.6 || samples[i+1] > 0.4)) {
-        freq = 0;
-    }
-        (*it)->setHeight(freq);
         (*it)->reset();
+        (*it)->setHeight(samples[i]);
         (*it)->redraw();
     }
 
     curLine++;
     delete samples;
-    v->redraw();
 }

@@ -48,7 +48,7 @@ void createScene(void) {
 void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(10, windowWidth/windowHeight, 0.1, 1000.0);
+    gluPerspective(10, windowWidth/windowHeight, 0.1, 100.0);
     glutPostRedisplay();
 }
 
@@ -69,11 +69,11 @@ void appInit(void) {
     glutReshapeFunc(reshape);
 
 
-    glm::mat4 Projection = glm::perspective(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
-    glm::mat4 View = glm::lookAt( glm::vec3(4,3,-3), 
-                                  glm::vec3(0,0,0),
+    glm::mat4 Projection = glm::perspective(10.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
+    glm::mat4 View = glm::lookAt( glm::vec3(2.0, 5.4,16), 
+                                  glm::vec3(-1,0,0),
                                   glm::vec3(0,1,0));
-    glm::mat4 Model = glm::mat4(1.0f);
+    glm::mat4 Model = glm::mat4(2.0f);
     MVP = Projection * View * Model;
     
     if (glewInit() != GLEW_OK) {
@@ -94,10 +94,10 @@ void appInit(void) {
 void redraw(void) {
     glutPostRedisplay();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    GLfloat ambient[4]  = {0.2, 0.2, 0.2, 1};
+    GLfloat ambient[4]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat diffuse[4]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat specular[4] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat location[4] = {0.2, 1.4, -1, 1.0};
+    GLfloat location[4] = {0.5, 1.4, 1.0, 1.0};
     glLightfv(GL_LIGHT1, GL_POSITION, location);
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);

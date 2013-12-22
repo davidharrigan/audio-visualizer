@@ -24,7 +24,7 @@ public:
 protected:
     //objects collection
     std::vector<std::vector<VBar*>*> lines;
-    VBar* v;
+    std::vector<VBar*> cubes;
     
     int sampleSize; 
     int steps; 

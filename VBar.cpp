@@ -9,108 +9,54 @@ extern int checkGLerror(const char*, bool quit=false);
 extern glm::mat4 MVP;
 extern GLuint shaderProgram;
 
-GLfloat move[] = {
-    0,0,1
-};
-
 GLfloat data[] = {
     -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f, -0.96875f,
-    -1.0f, 1.0f, -0.96875f,
-     -0.96875f, 1.0f,-1.0f,
+    -1.0f,-1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,
     -1.0f,-1.0f,-1.0f,
     -1.0f, 1.0f,-1.0f,
-     -0.96875f,-1.0f, -0.96875f,
+     1.0f,-1.0f, 1.0f,
     -1.0f,-1.0f,-1.0f,
-     -0.96875f,-1.0f,-1.0f,
-     -0.96875f, 1.0f,-1.0f,
-     -0.96875f,-1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, -0.96875f,
+    -1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f,-1.0f,
-     -0.96875f,-1.0f, -0.96875f,
-    -1.0f,-1.0f, -0.96875f,
+     1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,
     -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, -0.96875f,
-    -1.0f,-1.0f, -0.96875f,
-     -0.96875f,-1.0f, -0.96875f,
-     -0.96875f, 1.0f, -0.96875f,
-     -0.96875f,-1.0f,-1.0f,
-     -0.96875f, 1.0f,-1.0f,
-     -0.96875f,-1.0f,-1.0f,
-     -0.96875f, 1.0f, -0.96875f,
-     -0.96875f,-1.0f, -0.96875f,
-     -0.96875f, 1.0f, -0.96875f,
-     -0.96875f, 1.0,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f, 1.0,-1.0f,
     -1.0f, 1.0f,-1.0f,
-     -0.96875f, 1.0f, -0.96875f,
+     1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f, -0.96875f,
-     -0.96875f, 1.0f, -0.96875f,
-    -1.0f, 1.0f, -0.96875f,
-     -0.96875f,-1.0f, -0.96875f
+    -1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f
 
 };    
-
-GLfloat colors[] = {
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.585f, 0.771f, 0.014f, 
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.666f, 0.430f, 0.123f,
-    0.342f, 0.434f, 0.434f,
-    0.342f, 0.434f, 0.434f,
-};
 
 // Constructor
 //----------------------------------------------------
 VBar::VBar() {
-    xLoc = yLoc = zLoc = 0;
-    xSize = ySize = zSize = 0;
     childCount = 0;
     opacity = 0.8;
-    color = vec4(1,0,0,0);
+    color = vec4(0,0,0,0);
+    setLocation(0,0,0);
+    setSize(0,0,0);
 
     buildShaders();
     buildBuffers();
@@ -134,21 +80,18 @@ void VBar::buildBuffers() {
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
 
-    // Get a handle of the MVP uniform
+    // Get a handle of the uniform variables from shader
     matrixID = glGetUniformLocation(shaderProgram, "MVP");
-    moveID = glGetUniformLocation(shaderProgram, "move");
+    translationID = glGetUniformLocation(shaderProgram, "translation");
+    scaleID = glGetUniformLocation(shaderProgram, "scale");
+    colorID = glGetUniformLocation(shaderProgram, "vertexColor");
 
     // Our input
     vPositionID = glGetAttribLocation(shaderProgram, "vPosition");
-    colorID = glGetAttribLocation(shaderProgram, "vertexColor");
     
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STREAM_DRAW);
-
-    glGenBuffers(1, &colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 }
 
 //
@@ -163,45 +106,43 @@ void VBar::setLocation(float x, float y, float z) {
     xLoc = x; 
     yLoc = y; 
     zLoc = z;
+
+    translationMatrix = glm::translate(x, y, z);
 }
 
 void VBar::setSize(float xs, float ys, float zs) {
     xSize = xs;
     ySize = ys;
     zSize = zs;
+
+    scaleMatrix = glm::scale(xs, ys, zs);
 }
 
 void VBar::setHeight(float freq) {
-    float offset;
-    if (freq > 0.8) freq = 0.8; //limit the max height
-    else ySize = freq;
+    //ySize = freq;
+    
+    scaleMatrix[1][1] = freq;
+    translationMatrix[3][1] += freq;
 
-    //
-    int i;
-    for (i=1, iter = children.begin(); i < childCount+1; iter++, i++)
-       (*iter)->setHeight(freq-offset*i*2);
+    if (freq < 0.01) 
+        color = glm::vec4(0,0,0,0);
+    else if (freq < 0.2) 
+        color = glm::vec4(freq * 4.0f, 0.1f, 1.0f, 1.0f);
+    else if (freq < 0.4) 
+        color = glm::vec4(freq * 0.5f, freq * 2.0f, 1.0f, 1.0f);
+    else if (freq < 0.6)
+        color = glm::vec4(freq * 0.5f, freq * 2.0f, 0.8f, 1.0f);
+    else
+        color = glm::vec4(freq * 0.4f, freq * 1.5f, 0.4f, 1.0f);
 }
 
 void VBar::moveUp() {
     zLoc -= zSize;
-    opacity -= 0.2;
-
-    int i;
-    for (i=0, iter = children.begin(); i < childCount; i++, iter++)
-       (*iter)->moveUp(zSize);
-}
-
-void VBar::moveUp(float step) {
-    zLoc -= step;
-    opacity -= 0.001;
+    translationMatrix[3][2] = zLoc;
 }
 
 void VBar::reset() {
-    zLoc = 2;
-    opacity = 1;
-
-    for (iter = children.begin(); iter != children.end(); iter++)
-       (*iter)->reset();
+    zLoc = 2; translationMatrix = glm::translate(xLoc, yLoc, zLoc);
 }
 
 void VBar::redraw() {
@@ -213,22 +154,18 @@ void VBar::redraw() {
 
     // Send transformation to the currently bound shader 
     glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
-    glUniform4fv(moveID, 1, move);
+    glUniformMatrix4fv(translationID, 1, GL_FALSE, &translationMatrix[0][0]);
+    glUniformMatrix4fv(scaleID, 1, GL_FALSE, &scaleMatrix[0][0]);
+    glUniform4fv(colorID, 1, &color[0]);
 
     // Vertex
     glEnableVertexAttribArray(vPositionID);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(vPositionID, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    // Color
-    glEnableVertexAttribArray(colorID);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glVertexAttribPointer(colorID, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
     glDisableVertexAttribArray(vPositionID);
-    glDisableVertexAttribArray(colorID);
 
 
  /* 

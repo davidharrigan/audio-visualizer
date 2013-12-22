@@ -30,15 +30,18 @@ private:
     float xLoc, yLoc, zLoc;
     float xSize, ySize, zSize;
     float height;
-    glm::vec4  color;
     float opacity;
 
-    GLuint vertexbuffer, colorbuffer;
+    glm::vec4 color;
+    glm::mat4 translationMatrix; 
+    glm::mat4 scaleMatrix;
+
+    GLuint vertexbuffer;
     GLuint vPositionID;
     GLuint matrixID;
     GLuint colorID; 
     GLuint vertexArrayID;
-    GLuint moveID;
+    GLuint translationID, scaleID;
 
     std::vector<VBar*> children;  
     std::vector<VBar*>::iterator iter;
