@@ -31,6 +31,7 @@ private:
     float xSize, ySize, zSize;
     float height;
     float opacity;
+    float ch;
 
     glm::vec4 color;
     glm::mat4 translationMatrix; 

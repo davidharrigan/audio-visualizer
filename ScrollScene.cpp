@@ -17,16 +17,16 @@
 ScrollScene::ScrollScene() {
     curLine = 0;
     sampleSize = 2086;
-    numBars = 24;
-    float size = 2.0 / (numBars*6);
-    for (int i=0; i<numBars; i++) {
+    numBars = 128;
+    float size = 2.0 / (numBars*1.3);
+    for (int i=0; i<20; i++) {
         std::vector<VBar*>* temp = new std::vector<VBar*>();
         for (int j=0; j<numBars; j++) {
             VBar *b = new VBar();
             b->setSize(size, 1, size*10);
-            b->setLocation(1-j*size*8, 0, 0);
+            b->setLocation(1-j*size*2.3, 0, 0);
             temp->push_back(b); 
-            b->createChildren(8);
+            //b->createChildren(5);
         }
         lines.push_back(temp);
     }

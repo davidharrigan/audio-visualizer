@@ -23,8 +23,8 @@ else
     CCC         = g++
     LINKER      = g++
     GL_INC      = -I/usr/X11/include/GL
-    GL_LIBS     = -lglui -lglut -lGLU -lGL -lm -lGLEW
-    FMOD        = fmod/lib/libfmodex64.so
+    GL_LIBS     = -lglut -lGLU -lGL -lm -lGLEW
+    FMOD        = fmod/lib/libfmodex.so
 endif
 
 # -------------- Common specifications ---------------------------------

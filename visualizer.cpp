@@ -20,11 +20,13 @@
 using namespace glm;
 
 bool scroll;
-int windowWidth  = 1280;
-int windowHeight = 720;
+int windowWidth  = 640;
+int windowHeight = 480;
 float lightX, lightY = 0.0;
 float sceneX = 3.4;
 float sceneY = 5.4;
+
+int frame=0, curtime, timebase=0;
 
 GLuint shaderProgram;
 
@@ -59,6 +61,7 @@ void appInit(void) {
     glClearColor(0,0,0,0.0);
     glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_NORMALIZE);
@@ -113,6 +116,14 @@ void redraw(void) {
     else
         scene->redraw();
     glutSwapBuffers();
+
+    frame++;
+    curtime = glutGet(GLUT_ELAPSED_TIME);
+    if (curtime - timebase > 1000) {
+        printf("%f\n", frame * 1000.0 / (curtime - timebase));
+        timebase = curtime;
+        frame=0;
+    }
 }
 
 //

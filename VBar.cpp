@@ -55,6 +55,7 @@ VBar::VBar() {
     color = vec4(0,0,0,0);
     setLocation(0,0,0);
     setSize(0,0,0);
+    ch = 0;
 
     buildBuffers();
 }
@@ -108,35 +109,27 @@ void VBar::setSize(float xs, float ys, float zs) {
 }
 
 void VBar::setHeight(float freq) {
-    int i;
-    float offset;
     freq = (freq > 0.8) ? 0.8 : freq;
     scaleMatrix[1][1] = freq;
     translationMatrix[3][1] += freq;
 
-    if (freq < 0.01) 
+    if (freq < 0.05) 
         color = glm::vec4(0,0,0,0);
-    else if (freq < 0.2) {
+    else if (freq < 0.2) 
         color = glm::vec4(freq * 4.0f, 0.1f, 1.0f, 1.0f);
-        offset = 0.01;
-    } else if (freq < 0.4) {
+    else if (freq < 0.4) 
         color = glm::vec4(freq * 0.5f, freq * 2.0f, 1.0f, 1.0f);
-        offset = 0.02;
-    } else if (freq < 0.6) {
+    else if (freq < 0.6)
         color = glm::vec4(freq * 0.5f, freq * 2.0f, 0.8f, 1.0f);
-        offset = 0.04;
-    } else {
+    else 
         color = glm::vec4(freq * 0.4f, freq * 1.5f, 0.4f, 1.0f);
-        offset = 0.06;
-    }
-
-    childCount = (children.size() > 0 && freq >= 0.01) ? (freq * 8) : 0;
-    for (i=1, iter=children.begin(); i<childCount+1; iter++, i++) 
-        (*iter)->setHeight(freq-offset*i*2);
+    //childCount = (children.size() > 0 && freq >= 0.01) ? (freq * 5) : 0;
+    //for (i=1, iter=children.begin(); i<childCount+1; iter++, i++) 
+    //    (*iter)->setHeight(freq-offset*i*2);
 }
 
 void VBar::moveUp() {
-    zLoc -= zSize;
+    zLoc -= zSize + 0.05;
     translationMatrix[3][2] = zLoc;
 
     int i;
@@ -178,9 +171,10 @@ void VBar::redraw() {
 
     glDisableVertexAttribArray(vPositionID);
 
-    int i;
+   /* int i;
     for (i=0, iter = children.begin(); i < childCount; i++, iter++)
        (*iter)->redraw();
+       */
 }
 
 void VBar::createChildren(int maxChildren) {
