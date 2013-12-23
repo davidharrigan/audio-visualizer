@@ -127,8 +127,8 @@ void getSoundSpectrum(int range, float* output) {
     float* left = new float[8192];
     float* right = new float[8192];
     int curNote = 0;
-    sys->getSpectrum(left, 8192, 0, FMOD_DSP_FFT_WINDOW_RECT);
-    sys->getSpectrum(right, 8192, 1, FMOD_DSP_FFT_WINDOW_RECT);
+    sys->getSpectrum(left, 8192, 0, FMOD_DSP_FFT_WINDOW_BLACKMANHARRIS);
+    sys->getSpectrum(right, 8192, 1, FMOD_DSP_FFT_WINDOW_BLACKMANHARRIS);
 
     // average the left and right channels
     for (int i=0; i<8192; i++)
@@ -139,9 +139,23 @@ void getSoundSpectrum(int range, float* output) {
             curNote++;
         if (fftInterpValues_[i] > 0.01 && fftInterpValues_[i] < 1.0f) {
             //output[curNote % range] += (left[i] > right[i]) ? left[i] : right[i]; 
-            output[curNote % range] += fftInterpValues_[i];
-        }
+            output[i % range] += fftInterpValues_[i];
+            output[i % range] /= 2;
+       }
     }
+
+    // normalize volume
+    auto maxIterator = std::max_element(&output[0], &output[range]);
+    float maxVol = *maxIterator;
+    if (maxVol < 0.5) 
+        maxVol *= 2;
+    else if (maxVol < 0.3)
+        maxVol *= 4;
+
+    if (maxVol != 0)
+        std::transform(&output[0], &output[range], &output[0], [maxVol] (float dB) -> float {return dB / maxVol;});
+
+
     delete left;
     delete right;
 }
@@ -171,12 +185,12 @@ void Audio::initialize() {
     sys->init(32, FMOD_INIT_NORMAL, NULL);
     sys->getMasterChannelGroup(&channelGroup);
 
+    /*
     FMOD::DSP *parameq = 0;
     sys->createDSPByType(FMOD_DSP_TYPE_PARAMEQ, &parameq);
     sys->addDSP(parameq, 0);
     parameq->setParameter(FMOD_DSP_PARAMEQ_CENTER, 12000.0f);
 
-    /*
     FMOD::DSP *distortion = 0;
     sys->createDSPByType(FMOD_DSP_TYPE_DISTORTION, &distortion);
     sys->addDSP(distortion, 0);
