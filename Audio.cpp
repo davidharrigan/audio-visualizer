@@ -10,8 +10,7 @@
 #include <math.h>
 #include <algorithm>
 
-static const float notefreq[120] =
-{
+static const float notefreq[120] = {
       16.35f,   17.32f,   18.35f,   19.45f,    20.60f,    21.83f,    23.12f,    24.50f,    25.96f,    27.50f,    29.14f,    30.87f, 
       32.70f,   34.65f,   36.71f,   38.89f,    41.20f,    43.65f,    46.25f,    49.00f,    51.91f,    55.00f,    58.27f,    61.74f, 
       65.41f,   69.30f,   73.42f,   77.78f,    82.41f,    87.31f,    92.50f,    98.00f,   103.83f,   110.00f,   116.54f,   123.47f, 
@@ -52,114 +51,42 @@ int ofNextPow2(int x) {
 }
 
 //
-// Code borrowed from openFrameworks sounds library. 
-//
-float *getSoundSpectrum(int nBands){
-	// 	set to 0
-	for (int i = 0; i < 8192; i++)
-		fftInterpValues_[i] = 0;
-
-	// 	check what the user wants vs. what we can do:
-	if (nBands > 8192){
-		nBands = 8192;
-	} else if (nBands <= 0){
-		nBands = 1;
-		return fftInterpValues_;
-	}
-
-	// 	FMOD needs pow2
-	int nBandsToGet = ofNextPow2(nBands);
-	if (nBandsToGet < 64) nBandsToGet = 64;  // can't seem to get fft of 32, etc from fmodex
-
-	// 	get the fft
-	sys->getSpectrum(fftSpectrum_, nBandsToGet, 0, FMOD_DSP_FFT_WINDOW_HANNING);
-
-	// 	convert to db scale
-	for(int i = 0; i < nBandsToGet; i++){
-        fftValues_[i] = 10.0f * (float)log10(1 + fftSpectrum_[i]) * 2.0f;
-	}
-
-	// 	try to put all of the values (nBandsToGet) into (nBands)
-	//  in a way which is accurate and preserves the data:
-	if (nBandsToGet == nBands){
-		for(int i = 0; i < nBandsToGet; i++)
-			fftInterpValues_[i] = fftValues_[i];
-	} else {
-		float step 		= (float)nBandsToGet / (float)nBands;
-		int currentBand = 0;
-
-		for(int i = 0; i < nBandsToGet; i++){
-			// if I am current band = 0, I care about (0+1) * step, my end pos
-			// if i > endPos, then split i with me and my neighbor
-			if (i >= ((currentBand+1)*step)){
-
-				// do some fractional thing here...
-				float fraction = ((currentBand+1)*step) - (i-1);
-				float one_m_fraction = 1 - fraction;
-				fftInterpValues_[currentBand] += fraction * fftValues_[i];
-				currentBand++;
-
-				// safety check:
-				if (currentBand >= nBands)
-                    printf("currentBand is bigger");
-
-				fftInterpValues_[currentBand] += one_m_fraction * fftValues_[i];
-			} else {
-				// do normal things
-				fftInterpValues_[currentBand] += fftValues_[i];
-			}
-		}
-
-		// because we added "step" amount per band, divide to get the mean:
-		for (int i = 0; i < nBands; i++){
-			fftInterpValues_[i] /= step;
-			if (fftInterpValues_[i] > 1)fftInterpValues_[i] = 1; 	// this seems "wrong"
-		}
-	}
-	return fftInterpValues_;
-}
-
-//
 // Return sound spectrum with specific range. Useful if you want to
 // combine different frequencies with the same musical note 
 //
 void getSoundSpectrum(int range, float* output) {
-    float* left = new float[8192];
-    float* right = new float[8192];
-    int curNote = 0;
-    sys->getSpectrum(left, 8192, 0, FMOD_DSP_FFT_WINDOW_BLACKMANHARRIS);
-    sys->getSpectrum(right, 8192, 1, FMOD_DSP_FFT_WINDOW_BLACKMANHARRIS);
+    int num = 8192;
+    float* left = new float[num];
+    float* right = new float[num];
+    sys->getSpectrum(left, num, 0, FMOD_DSP_FFT_WINDOW_BLACKMANHARRIS);
+    sys->getSpectrum(right, num, 1, FMOD_DSP_FFT_WINDOW_BLACKMANHARRIS);
 
     // average the left and right channels
-    for (int i=0; i<8192; i++)
-        fftInterpValues_[i] = (left[i] + right[i]) / 2;
+    for (int i=0; i<num; i++) {
+        fftInterpValues_[i] = (left[i] + right[i]) / 2.0f;
+//        fftInterpValues_[i] = 10.0f * (float)log10(1 + fftInterpValues_[i]) * 2.0f;
+    }
 
-    for (int i=0; i<8192; i++) {
-        if ((float)i > notefreq[curNote + 1] - notefreq[curNote +1] / 2) 
-            curNote++;
-        if (fftInterpValues_[i] > 0.01 && fftInterpValues_[i] < 1.0f) {
+    for (int i=0; i<num; i++) {
+        if (fftInterpValues_[i] > 0.01 ) {
             //output[curNote % range] += (left[i] > right[i]) ? left[i] : right[i]; 
             output[i % range] += fftInterpValues_[i];
-            output[i % range] /= 2;
+            if (output[i % range] - fftInterpValues_[i] != 0)
+                output[i % range] /= 2.0;
        }
     }
 
     // normalize volume
     auto maxIterator = std::max_element(&output[0], &output[range]);
     float maxVol = *maxIterator;
-    if (maxVol < 0.5) 
-        maxVol *= 2;
-    else if (maxVol < 0.3)
-        maxVol *= 4;
+    maxVol *= 1.6;
 
     if (maxVol != 0)
         std::transform(&output[0], &output[range], &output[0], [maxVol] (float dB) -> float {return dB / maxVol;});
 
-
     delete left;
     delete right;
 }
-
 
 
 // Constructor
@@ -174,28 +101,18 @@ Audio::Audio() {
 // Destructor
 //-------------------------------------------
 Audio::~Audio() {
+    delete channel;
+    delete sound;
 }
+
 
 //
 // Initialize FMOD system
 //
 void Audio::initialize() {
     result = System_Create(&sys);
-    //sys->setOutput(FMOD_OUTPUTTYPE_ALSA);
     sys->init(32, FMOD_INIT_NORMAL, NULL);
     sys->getMasterChannelGroup(&channelGroup);
-
-    /*
-    FMOD::DSP *parameq = 0;
-    sys->createDSPByType(FMOD_DSP_TYPE_PARAMEQ, &parameq);
-    sys->addDSP(parameq, 0);
-    parameq->setParameter(FMOD_DSP_PARAMEQ_CENTER, 12000.0f);
-
-    FMOD::DSP *distortion = 0;
-    sys->createDSPByType(FMOD_DSP_TYPE_DISTORTION, &distortion);
-    sys->addDSP(distortion, 0);
-    distortion->setParameter(FMOD_DSP_DISTORTION_LEVEL, 0.2f);
-    */
 }
 
 //
@@ -233,13 +150,11 @@ bool Audio::loadFile() {
 //
 void Audio::play() {
    sys->playSound( FMOD_CHANNEL_FREE, sound, 0, &channel);
-   //FMOD_Channel_GetFrequency(channel, &sampleRate);
    channel->setVolume(volume);
    channel->setPan(pan);
    channel->setFrequency(sampleRate);
    channel->setMode(FMOD_LOOP_OFF);
    sys->update();
-    
 }
 
 //

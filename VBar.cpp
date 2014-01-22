@@ -4,7 +4,6 @@
 
 using namespace glm;
 
-
 extern int checkGLerror(const char*, bool quit=false);
 extern glm::mat4 MVP;
 extern GLuint shaderProgram;
@@ -123,18 +122,11 @@ void VBar::setHeight(float freq) {
         color = glm::vec4(freq * 0.5f, freq * 2.0f, 0.8f, 1.0f);
     else 
         color = glm::vec4(freq * 0.4f, freq * 1.5f, 0.4f, 1.0f);
-    //childCount = (children.size() > 0 && freq >= 0.01) ? (freq * 5) : 0;
-    //for (i=1, iter=children.begin(); i<childCount+1; iter++, i++) 
-    //    (*iter)->setHeight(freq-offset*i*2);
 }
 
 void VBar::moveUp() {
     zLoc -= zSize + 0.05;
     translationMatrix[3][2] = zLoc;
-
-    int i;
-    for (i=0, iter=children.begin(); i<childCount; i++, iter++)
-        (*iter)->moveUp(zSize);
 }
 
 void VBar::moveUp(float step) {
@@ -144,9 +136,6 @@ void VBar::moveUp(float step) {
 
 void VBar::reset() {
     zLoc = 2; translationMatrix = glm::translate(xLoc, yLoc, zLoc);
-
-    for (iter=children.begin(); iter != children.end(); iter++)
-        (*iter)->reset();
 }
 
 void VBar::redraw() {
@@ -170,18 +159,4 @@ void VBar::redraw() {
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
     glDisableVertexAttribArray(vPositionID);
-
-   /* int i;
-    for (i=0, iter = children.begin(); i < childCount; i++, iter++)
-       (*iter)->redraw();
-       */
-}
-
-void VBar::createChildren(int maxChildren) {
-    for (int i=1; i<maxChildren+1; i++) {
-        VBar* v = new VBar();
-        v->setLocation(xLoc, yLoc, zLoc+(i*0.005));
-        v->setSize(xSize+(xSize*(1+i)), ySize, zSize);
-        children.push_back(v);
-    }
 }

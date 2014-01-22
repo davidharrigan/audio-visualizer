@@ -5,13 +5,11 @@
 
 #include <stdio.h>
 #include "opengl.h"
-#include "shader.h"
+#include "Shader.h"
 #include "Audio.h"
 
 #include "Point3.h"
 #include "Scene.h"
-#include "ScrollScene.h"
-#include "Box.h"
 
 #include <math.h>
 #include <unistd.h>
@@ -20,8 +18,8 @@
 using namespace glm;
 
 bool scroll;
-int windowWidth  = 640;
-int windowHeight = 480;
+int windowWidth  = 1600;//1920;//640;
+int windowHeight = 900;//1080;//480;
 float lightX, lightY = 0.0;
 float sceneX = 3.4;
 float sceneY = 5.4;
@@ -31,18 +29,9 @@ int frame=0, curtime, timebase=0;
 GLuint shaderProgram;
 
 Scene *scene;
-ScrollScene *scrollScene;
 Audio *audio;
 
 glm::mat4 MVP; 
-
-//
-// Create a scene
-//
-void createScene(void) {
-    scrollScene = new ScrollScene();
-    scene = new Scene(); 
-}
 
 //
 // Window reshape function
@@ -73,8 +62,8 @@ void appInit(void) {
 
 
     glm::mat4 Projection = glm::perspective(10.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
-    glm::mat4 View = glm::lookAt( glm::vec3(2.0, 5.4,16), 
-                                  glm::vec3(-1,0,0),
+    glm::mat4 View = glm::lookAt( glm::vec3(2.0, 6.0,18), 
+                                  glm::vec3(-1,1,1),
                                   glm::vec3(0,1,0));
     glm::mat4 Model = glm::mat4(2.0f);
     MVP = Projection * View * Model;
@@ -88,7 +77,7 @@ void appInit(void) {
     shaderProgram = loadShaders("vertex.vsh", "color.fsh");
     glUseProgram(shaderProgram);
 
-    createScene();
+    scene = new Scene(); 
 }
 
 //
@@ -111,12 +100,11 @@ void redraw(void) {
     gluLookAt(sceneX,sceneY,16,
               0.5,0,0,
               0,1,0);
-    if (!scroll)
-        scrollScene->redraw();
-    else
-        scene->redraw();
+
+    scene->redraw();
     glutSwapBuffers();
 
+    #if debug
     frame++;
     curtime = glutGet(GLUT_ELAPSED_TIME);
     if (curtime - timebase > 1000) {
@@ -124,6 +112,7 @@ void redraw(void) {
         timebase = curtime;
         frame=0;
     }
+    #endif
 }
 
 //

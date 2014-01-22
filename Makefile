@@ -1,7 +1,11 @@
 #
 # David Harrigan
-# 
+#
+# Run this command when running from mac after make
 # install_name_tool -change ./libfmodex.dylib fmod/lib/fmodex.dylib visualizer
+#
+# Make sure to select the right architecture of fmod depending on your
+# system. 
 
 PROG = visualizer
 MYCPPFLAGS = -std=c++11 
@@ -24,7 +28,7 @@ else
     LINKER      = g++
     GL_INC      = -I/usr/X11/include/GL
     GL_LIBS     = -lglut -lGLU -lGL -lm -lGLEW
-    FMOD        = fmod/lib/libfmodex.so
+    FMOD        = fmod/lib/libfmodex64.so
 endif
 
 # -------------- Common specifications ---------------------------------

@@ -23,7 +23,6 @@ public:
 
     void buildBuffers();
     void buildShaders();
-    void createChildren(int);
   
 private:
 

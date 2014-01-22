@@ -17,7 +17,6 @@
 #define SPEED 1
 
 // Global functions
-float *getSoundSpectrum(int);
 void getSoundSpectrum(int, float*);
 
 class Audio {

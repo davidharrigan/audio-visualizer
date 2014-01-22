@@ -1,4 +1,6 @@
-
+/**
+ * Color.h encapsulates OpenGL color properties
+ */
 #ifndef COLOR_H
 #define COLOR_H
 

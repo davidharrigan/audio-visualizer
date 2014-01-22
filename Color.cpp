@@ -1,3 +1,6 @@
+/**
+ * Color.cpp - encapsulates OpenGL color properties 
+ */
 
 #include "Color.h"
 

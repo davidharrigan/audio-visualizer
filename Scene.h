@@ -9,29 +9,26 @@
 
 #include <vector>
 #include <string>
-#include <GL/glut.h>
-#include "Box.h"
+#include "opengl.h"
+#include "VBar.h"
 #include "Audio.h"
 
 class Scene {
 public:
     Scene();
 
-    void addObject( Box* object );
+    void addObject( VBar* object );
     void clear();
     void redraw();
     
 protected:
     //objects collection
-    std::vector<Box*> objects;
-    std::vector<Box*> objects2;
-    std::vector<Box*>::reverse_iterator it;
+    std::vector<std::vector<VBar*>*> lines;
+    std::vector<VBar*> cubes;
     
-    GLuint textureID;
     int sampleSize; 
     int steps; 
     int numBars;
-    int curLine;
-
+    unsigned int curLine;
 };
 #endif /*SCENE_H_*/

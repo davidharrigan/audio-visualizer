@@ -9,86 +9,27 @@
 
 #include <iostream>
 #include "Audio.h"
-#include "Box.h"
+#include "VBar.h"
 
-//
-// Generate texture for the background
-//
-void generateNoise(float samples[], GLubyte noise[1024][1024][3]) {
-    for (int y=0; y<1024; y++) {
-        float freq = samples[y];
-        freq += samples[y+1];
-        freq += samples[y+2];
-        freq += samples[y+3];
-        for (int x=0; x<1024; x++) {
-            if (freq < 0.001) {
-                noise[x][y][0] = 0x00; // R
-                noise[x][y][1] = 0x00; // G
-                noise[x][y][2] = 0x00; // B
-            } 
-            else if (freq < 0.01) {
-                noise[x][y][0] = 0xc0;
-                noise[x][y][1] = 0xc0;
-                noise[x][y][2] = 0xfe;
-            }
-            else if (freq < 0.02) {
-                noise[x][y][0] = 0x6b;
-                noise[x][y][1] = 0xd9;
-                noise[x][y][2] = 0xfe;
-            } 
-            else if (freq < 0.04) {
-                noise[x][y][0] = 0xff;
-                noise[x][y][1] = 0x22;
-                noise[x][y][2] = 0x22;
-            }
-            else if (freq < 0.08) {
-                noise[x][y][0] = 0x00;
-                noise[x][y][1] = 0xbb;
-                noise[x][y][2] = 0xaa;
-            }
-            else if (freq < 0.14) {
-                noise[x][y][0] = 0x22;
-                noise[x][y][1] = 0x00;
-                noise[x][y][2] = 0xee;
-            }
-            else {
-                noise[x][y][0] = 0xaa;
-                noise[x][y][1] = 0x00;
-                noise[x][y][2] = 0xff;
-            }
-        }
-    }
-}
-
-
-// Constructor
+// Constructors
 // ------------------------------------------------------------------
 
 Scene::Scene() {
-    sampleSize = 4096; //2028, 4096, and 8192 are good
-    steps = 3;
-    numBars = 100;
-    float size = 2.0 / numBars;
-    for (int i=0; i<numBars; i++) {
-        Box *b = new Box();
-        b->setSize(size, 0, size);
-        b->setColor(new Color(0,0,0));
-        b->setLocation(1-i*size, 0, 0);
-        objects.push_back(b);
+    curLine = 0;
+    sampleSize = 2086;
+    numBars = 120;
+    float size = 2.0 / (numBars*1.3);
+    for (int i=0; i<30; i++) {
+        std::vector<VBar*>* temp = new std::vector<VBar*>();
+        for (int j=0; j<numBars; j++) {
+            VBar *b = new VBar();
+            b->setSize(size, 1, size*10);
+            b->setLocation(1-j*size*2.3, 0, 0);
+            temp->push_back(b); 
+            //b->createChildren(5);
+        }
+        lines.push_back(temp);
     }
-    numBars = 200;
-    size = 2.0 / numBars;
-    for (int i=0; i<numBars; i++) {
-        Box *b = new Box();
-        b->setSize(size, 0, size);
-        b->setColor(new Color(0,0,0));
-        b->setLocation(1-i*size, 0, 0);
-        objects2.push_back(b);
-    }
-    textureID = 0;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
 }
 
 
@@ -99,57 +40,35 @@ Scene::Scene() {
 // Redraws the scene
 //
 void Scene::redraw() {
-    glPushMatrix();
-    glTranslatef(0, -1, 0);
-    int i;
-    float ampAvg = 0;
-    float* samples = getSoundSpectrum(sampleSize);
+    unsigned int i;
+    float* samples = new float[numBars];
+    if (curLine >= lines.size())
+        curLine = 0;
 
-    for (i=10, it = objects.rbegin(); it != objects.rend(); i+=steps, it++) {
-        float freq = 0;
-        for (int j=0; j<steps; j++) {
-            freq += samples[i + j];
-            ampAvg += freq;
+    std::vector<VBar*> objects = *lines[curLine];
+    std::vector<VBar*>::reverse_iterator it;
+    std::vector<std::vector<VBar*>*>::iterator itt;
+
+    // get sound spectrum
+    for (i=0; i<(unsigned)numBars; i++) 
+        samples[i] = 0;
+    getSoundSpectrum(numBars, samples);
+
+    // move up all lines
+    for (i=0, itt=lines.begin(); itt != lines.end(); itt++, i++) {
+        for (it=(*itt)->rbegin(); it != (*itt)->rend(); it++) {
+            (*it)->moveUp();
+            (*it)->redraw();
         }
-        freq /= steps;
-        (*it)->redraw(freq);
     }
-    ampAvg /= i;
 
-    glTranslatef(0,-0.005,0);
-    glRotatef(90,1,0,0);
-   
-    for (it=objects2.rbegin(); it != objects2.rend(); i+= steps, it++) {
-        float freq = 0;
-        for (int j=0; j<steps; j++) 
-            freq += samples[i + j];
-
-        freq /= steps; 
-        (*it)->redraw(freq);
+    // redraw samples for current line
+    for (i=0, it = objects.rbegin(); it != objects.rend(); i++, it++) {
+        (*it)->reset();
+        (*it)->setHeight(samples[i]);
+        (*it)->redraw();
     }
-    glPopMatrix();
 
-    GLubyte noise[1024][1024][3];
-    generateNoise(samples, noise);
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE,noise);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glPushMatrix();
-        glBegin(GL_QUADS);
-            glVertex3f(-1,-1,0);
-            glTexCoord2i(-1,-1);
-            glVertex3f(-1,1,-1);
-            glTexCoord2i(-1,1);
-            glVertex3f(1,1,-1);
-            glTexCoord2i(1,1);
-            glVertex3f(1,-1,0);
-            glTexCoord2i(1,-1);
-        glEnd();
-    glPopMatrix();
-    glDisable(GL_TEXTURE_2D);
+    curLine++;
+    delete samples;
 }

@@ -1,5 +1,5 @@
 /**
- *
+ * checkGLerror.cpp - checks and prints OpenGL errors
  *
  */
 
